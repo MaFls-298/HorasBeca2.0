@@ -8,7 +8,7 @@ public class Alumno {
     private int horasAcumuladas;
 
     public Alumno(int carnetUser, String nombreUser, String emailInstitucional,
-                  String passwordUser, int horasBecaPendiente) {
+                String passwordUser, int horasBecaPendiente) {
         this.carnetUser = carnetUser;
         this.nombreUser = nombreUser;
         this.emailInstitucional = emailInstitucional;
@@ -19,7 +19,7 @@ public class Alumno {
 
     public boolean autenticar(String correo, String contrasenia) {
         return this.emailInstitucional.equals(correo) &&
-               this.passwordUser.equals(contrasenia);
+            this.passwordUser.equals(contrasenia);
     }
 
     public void agregarHoras(int horas) {
@@ -33,7 +33,7 @@ public class Alumno {
 
     public String getUserInfo() {
         return "Carnet: " + carnetUser + ", Nombre: " + nombreUser +
-               ", Correo: " + emailInstitucional + ", Horas pendientes: " +
-               horasBecaPendiente + ", Horas acumuladas: " + horasAcumuladas;
+            ", Correo: " + emailInstitucional + ", Horas pendientes: " +
+            horasBecaPendiente + ", Horas acumuladas: " + horasAcumuladas;
     }
 }

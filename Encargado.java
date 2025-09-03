@@ -6,7 +6,7 @@ public class Encargado {
 
     
     public Encargado(int carnetUser, String nombreUser, String emailInstitucional,
-                     String passwordUser) {
+                    String passwordUser) {
         this.carnetUser = carnetUser;
         this.nombreUser = nombreUser;
         this.emailInstitucional = emailInstitucional;
@@ -16,7 +16,7 @@ public class Encargado {
     
     public boolean autenticar(String correo, String contrasenia) {
         return this.emailInstitucional.equals(correo) &&
-               this.passwordUser.equals(contrasenia);
+            this.passwordUser.equals(contrasenia);
     }
 
     public void publicarActividad(String titulo) {

@@ -6,7 +6,7 @@ public class Usuario {
     private String tipoUsuario; 
 
     public Usuario(int carnetUser, String nombreUser, String emailInstitucional,
-                   String passwordUser, String tipoUsuario) {
+                String passwordUser, String tipoUsuario) {
         this.carnetUser = carnetUser;
         this.nombreUser = nombreUser;
         this.emailInstitucional = emailInstitucional;
@@ -16,7 +16,7 @@ public class Usuario {
 
     public boolean autenticar(String correo, String contrasenia) {
         return this.emailInstitucional.equals(correo) &&
-               this.passwordUser.equals(contrasenia);
+            this.passwordUser.equals(contrasenia);
     }
 
     public void resetPassword(String newPassword) {
@@ -29,6 +29,6 @@ public class Usuario {
 
     public String getUserInfo() {
         return "Carnet: " + carnetUser + ", Nombre: " + nombreUser +
-               ", Correo: " + emailInstitucional + ", Tipo: " + tipoUsuario;
+            ", Correo: " + emailInstitucional + ", Tipo: " + tipoUsuario;
     }
 }

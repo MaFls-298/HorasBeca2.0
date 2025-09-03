@@ -9,7 +9,7 @@ public class UsuarioController {
 
     
     public void registrarUsuario(String correo, String contrasena, String tipo, 
-                                 int carnet, String nombre) {
+                                int carnet, String nombre) {
         Usuario nuevo = new Usuario(carnet, nombre, correo, contrasena, tipo);
         usuarios.add(nuevo);
         System.out.println("Usuario registrado: " + nombre + " (" + tipo + ")");

@@ -14,4 +14,6 @@ iygual va a haber que modificar varias cosas del codigo para hacer la conexion /
 
 JDBC API
 Tu dices rana y yo salto <3 jajaja me dices en que puedo ayudarte con tus clases, si quieres!
+
+
 Hagan todo ustedes. yo y mi chatgpt ya hicimos mucho 🤑

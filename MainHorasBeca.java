@@ -1,0 +1,127 @@
+import javax.swing.*;
+
+public class MainHorasBeca{
+
+    private static UsuarioController usuarioController = new UsuarioController();
+
+    public static void main(String[] args) {
+        
+        // USUARIOS EJEMPLO
+        Alumno alumno1 = new Alumno(221010, "Pancracio", "p@uvg.edu", "6666", 50);
+        Encargado encargado1 = new Encargado(111477, "Florinda", "fl@uvg.edu", "abcd", "Biiologia");
+        usuarioController.registrarUsuario(alumno1);
+        usuarioController.registrarUsuario(encargado1);
+
+        
+        JFrame loginFrame = new JFrame("HORAS BECA UVG - Login"); //login
+        loginFrame.setSize(800, 450);
+        loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        loginFrame.setLocationRelativeTo(null);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        panel.add(Box.createVerticalStrut(10));
+
+        JTextField emailField = new JTextField();
+        emailField.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, 30));
+        emailField.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        panel.add(new JLabel("Correo:"));
+        panel.add(emailField);
+
+        panel.add(Box.createVerticalStrut(10));
+
+        JPasswordField passwordField = new JPasswordField();
+        passwordField.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, 30));
+        passwordField.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        panel.add(new JLabel("Contraseña:"));
+        panel.add(passwordField);
+
+        panel.add(Box.createVerticalStrut(20));
+
+        JButton loginButton = new JButton("Login");
+        loginButton.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        panel.add(loginButton);
+
+        loginFrame.add(panel);
+        loginFrame.setVisible(true);
+
+        loginButton.addActionListener(e -> {
+            String email = emailField.getText();
+            String password = new String(passwordField.getPassword());
+            Usuario usuario = usuarioController.login(email, password);
+
+            if (usuario != null) {
+                loginFrame.dispose();
+
+                if (usuario instanceof Alumno) {
+                    mostrarAlumnoView((Alumno) usuario);
+                } else if (usuario instanceof Encargado) {
+                    mostrarEncargadoView((Encargado) usuario);
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Credenciales incorrectas");
+            }
+        });
+    }
+
+    public static void mostrarAlumnoView(Alumno alumno) {
+        JFrame alumnoFrame = new JFrame("Alumno - " + alumno.getNombreUser());
+        alumnoFrame.setSize(400, 300);
+        alumnoFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        alumnoFrame.setLocationRelativeTo(null);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.add(Box.createVerticalStrut(20));
+
+        JButton btnHorasPendientes = new JButton("Ver Horas Pendientes");
+        JButton btnActividadesDisponibles = new JButton("Ver Actividades Disponibles");
+        JButton btnActividadesInscritas = new JButton("Ver Mis Actividades");
+        JButton btnCerrarSesion = new JButton("Cerrar Sesión");
+
+        btnHorasPendientes.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        btnActividadesDisponibles.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        btnActividadesInscritas.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        btnCerrarSesion.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+
+        panel.add(btnHorasPendientes);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(btnActividadesDisponibles);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(btnActividadesInscritas);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(btnCerrarSesion);
+
+        alumnoFrame.add(panel);
+        alumnoFrame.setVisible(true);
+    }
+
+    public static void mostrarEncargadoView(Encargado encargado) {
+        JFrame encargadoFrame = new JFrame("Encargado - " + encargado.getNombreUser());
+        encargadoFrame.setSize(400, 300);
+        encargadoFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        encargadoFrame.setLocationRelativeTo(null);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.add(Box.createVerticalStrut(20));
+
+        JButton btnAñadirActividad = new JButton("Añadir Actividad");
+        JButton btnVerActividades = new JButton("Ver Lista de Actividades");
+        JButton btnCerrarSesion = new JButton("Cerrar Sesión");
+
+        btnAñadirActividad.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        btnVerActividades.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        btnCerrarSesion.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+
+        panel.add(btnAñadirActividad);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(btnVerActividades);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(btnCerrarSesion);
+
+        encargadoFrame.add(panel);
+        encargadoFrame.setVisible(true);
+    }
+}

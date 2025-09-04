@@ -1,3 +1,5 @@
+HISTORIAL HORAS
+
 /**
  * Autor: Estefanie 251610
  * Programa: Horas Beca
@@ -20,3 +22,21 @@ public class HistorialHoras {
         this.fecha = fecha;
     }
 }
+
+
+
+
+
+
+/*
+    public String getUserType() {
+        return this.tipoUsuario;
+    }
+
+    public String getUserInfo() {
+        return "Carnet: " + carnetUser + ", Nombre: " + nombreUser +
+            ", Correo: " + emailInstitucional + ", Tipo: " + tipoUsuario;
+    }
+}
+*/
+

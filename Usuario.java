@@ -1,34 +1,45 @@
-public class Usuario {
-    private int carnetUser;
-    private String nombreUser;
-    private String emailInstitucional;
-    private String passwordUser;
-    private String tipoUsuario; 
+public abstract class Usuario {
+    protected int carnetUser;
+    protected String nombreUser;
+    protected String emailInstitucional;
+    protected String passwordUser;
 
-    public Usuario(int carnetUser, String nombreUser, String emailInstitucional,
-                String passwordUser, String tipoUsuario) {
+    public Usuario(int carnetUser, String nombreUser, String emailInstitucional, String passwordUser){
         this.carnetUser = carnetUser;
         this.nombreUser = nombreUser;
         this.emailInstitucional = emailInstitucional;
         this.passwordUser = passwordUser;
-        this.tipoUsuario = tipoUsuario;
     }
 
-    public boolean autenticar(String correo, String contrasenia) {
-        return this.emailInstitucional.equals(correo) &&
-            this.passwordUser.equals(contrasenia);
+    public boolean verifLogin(String email, String password) {
+        return this.emailInstitucional.equals(email) && this.passwordUser.equals(password);
+    }
+
+    public void setPasswordUser(String passwordUser){ 
+        this.passwordUser = passwordUser; 
+        }
+
+    public int getCarnetUser(){
+        return carnetUser;        
+    }
+
+    public String getNombreUser(){
+        return nombreUser;
+    }
+
+    public String getUserEmail(){
+        return emailInstitucional;
+    }
+
+    public String getPasswordUser(){
+        return passwordUser;
     }
 
     public void resetPassword(String newPassword) {
         this.passwordUser = newPassword;
     }
 
-    public String getUserType() {
-        return this.tipoUsuario;
-    }
+    
 
-    public String getUserInfo() {
-        return "Carnet: " + carnetUser + ", Nombre: " + nombreUser +
-            ", Correo: " + emailInstitucional + ", Tipo: " + tipoUsuario;
-    }
 }
+

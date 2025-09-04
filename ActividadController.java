@@ -1,33 +1,64 @@
+/**
+ * Autor: Estefanie 251610
+ * Programa: Horas Beca
+ * Fecha de creación: 31/08/2025
+ */
 
 import java.util.ArrayList;
 
 public class ActividadController {
-    private ArrayList<Actividad> actividades = new ArrayList<>();
+    private ArrayList<Actividad> actividadesList;
 
-    public void agregarActividad(String nombre, String descripcion, int horasOtorgadas, int cupoMaximo) {
-        Actividad nueva = new Actividad(nombre, descripcion, horasOtorgadas, cupoMaximo);
-        actividades.add(nueva);
+    public ActividadController() {
+        this.actividadesList = new ArrayList<>();
     }
 
-    public Actividad buscarActividad(String nombre) {
-        for (Actividad act : actividades) {
-            if (act.nombre.equals(nombre)) {
-                return act;
+
+    public void crearActividad(Actividad actividad) {
+        actividadesList.add(actividad);
+    }
+
+    public Actividad searchActividadName(String tituloActividad) {
+        for (Actividad actividad : actividadesList) {
+            if (actividad.getTituloActividad() == tituloActividad) {
+                return actividad;
             }
         }
         return null;
     }
 
-    public boolean inscribirAlumno(String nombreActividad) {
-        Actividad act = buscarActividad(nombreActividad);
-        if (act != null && act.tieneCupoDisponible()) {
-            act.registrarAlumno();
+    public Actividad searchActividadId(int idActividad) {
+        for (Actividad actividad : actividadesList) {
+            if (actividad.getIdActividad() == idActividad) {
+                return actividad;
+            }
+        }
+        return null;
+    }
+
+    public boolean inscribirAlumno(Alumno alumno, String tituloActividad) {
+        Actividad act = searchActividadName(tituloActividad);
+        if (act != null && act.verStateActividad()){
+            act.inscribirAlumno(alumno);
+            alumno.agregarActividad(act);
             return true;
         }
         return false;
     }
 
-    public ArrayList<Actividad> obtenerActividadesDisponibles() {
+    public boolean validarHorasAlumno(Alumno alumno, int idActividad) {
+        Actividad act = searchActividadId(idActividad);
+        if (act != null && alumno.getActivRealizadasList().contains(act)) {
+            return true;
+        }
+        return false;
+    }
+
+    public ArrayList<Actividad> getTodasActividades() {
+        return actividadesList;
+    }
+
+        /*public ArrayList<Actividad> getActividadesDisponibles() {
         ArrayList<Actividad> disponibles = new ArrayList<>();
         for (Actividad act : actividades) {
             if (act.tieneCupoDisponible()) {
@@ -35,5 +66,5 @@ public class ActividadController {
             }
         }
         return disponibles;
-    }
+    }*/
 }

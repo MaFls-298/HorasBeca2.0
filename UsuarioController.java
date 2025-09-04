@@ -4,33 +4,49 @@ public class UsuarioController {
     private ArrayList<Usuario> usuarios;
 
     public UsuarioController() {
-        usuarios = new ArrayList<>();
+        this.usuarios = new ArrayList<>();
     }
 
     
-    public void registrarUsuario(String correo, String contrasena, String tipo, 
-                                int carnet, String nombre) {
-        Usuario nuevo = new Usuario(carnet, nombre, correo, contrasena, tipo);
-        usuarios.add(nuevo);
-        System.out.println("Usuario registrado: " + nombre + " (" + tipo + ")");
+    public void registrarUsuario(Usuario usuario) { 
+        usuarios.add(usuario);
     }
 
     
-    public Usuario login(String correo, String contrasena) {
+    public Usuario login(String email, String password) {
         for (Usuario u : usuarios) {
-            if (u.autenticar(correo, contrasena)) {
-                System.out.println("Login exitoso: " + u.getUserInfo());
+            if (u.verifLogin(email, password)) {
                 return u;
             }
         }
-        System.out.println("Error: correo o contraseña incorrectos");
         return null;
     }
 
-    
-    public void mostrarUsuarios() {
-        for (Usuario u : usuarios) {
-            System.out.println(u.getUserInfo());
+    public Usuario searchByCarnet(int carnetUser) {
+        for (Usuario user : usuarios) {
+            if (user.getCarnetUser() == carnetUser) {
+                return user;
+            }
         }
+        return null;
     }
+
+    public boolean cambiarContrasena(int carnetUser, String nuevaContrasena) {
+        Usuario user = searchByCarnet(carnetUser);
+        if (user != null) {
+            user.setPasswordUser(nuevaContrasena);
+            return true;
+        }
+        return false;
+    }
+
+    public ArrayList<Usuario> getUsuarios() {
+        return usuarios;
+    }
+    
+    /* public void mostrarUsuarios() {
+        for (Usuario u : usuarios) {
+            System.out.println(u.getUserInfo()); 
+                    }
+    } */
 }

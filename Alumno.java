@@ -1,34 +1,40 @@
-public class Alumno {
-    private int carnetUser;
-    private String nombreUser;
-    private String emailInstitucional;
-    private String passwordUser;
+import java.util.ArrayList;
+import java.util.List;
 
+public class Alumno extends Usuario{
     private int horasBecaPendiente;
     private int horasAcumuladas;
+    private List<Actividad> actividadesRealizadasList;
 
-    public Alumno(int carnetUser, String nombreUser, String emailInstitucional,
-                String passwordUser, int horasBecaPendiente) {
-        this.carnetUser = carnetUser;
-        this.nombreUser = nombreUser;
-        this.emailInstitucional = emailInstitucional;
-        this.passwordUser = passwordUser;
-        this.horasBecaPendiente = horasBecaPendiente;
+    public Alumno(int carnetUser, String nombreUser, String emailInstitucional, String passwordUser, int horasBecaPendiente){
+        super(carnetUser, nombreUser, emailInstitucional, passwordUser);
+        this.actividadesRealizadasList = new ArrayList<>();
         this.horasAcumuladas = 0;
+        this.horasBecaPendiente = horasBecaPendiente;
+        
     }
 
-    public boolean autenticar(String correo, String contrasenia) {
-        return this.emailInstitucional.equals(correo) &&
-            this.passwordUser.equals(contrasenia);
+    public void agregarActividad(Actividad actividad) {
+        actividadesRealizadasList.add(actividad);
+        
+    }
+    public void agregarHoras(Actividad actividad) {
+        horasAcumuladas += actividad.getHorasOtorgadasActividad();
+        horasBecaPendiente -= actividad.getHorasOtorgadasActividad();
     }
 
-    public void agregarHoras(int horas) {
-        this.horasAcumuladas += horas;
-        this.horasBecaPendiente -= horas;
-    }
 
-    public int calcularHorasPendientes() {
+
+    public int getHorasPendientes(){
         return horasBecaPendiente;
+    }
+
+    public int getHorasAcumuladas(){
+        return horasAcumuladas;
+    }
+
+    public List<Actividad> getActivRealizadasList(){
+        return actividadesRealizadasList;
     }
 
     public String getUserInfo() {

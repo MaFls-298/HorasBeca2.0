@@ -1,9 +1,3 @@
-/**
- * Autor: Estefanie 251610
- * Programa: Horas Beca
- * Fecha de creación: 31/08/2025
- */
-
 import java.util.ArrayList;
 
 public class ActividadController {

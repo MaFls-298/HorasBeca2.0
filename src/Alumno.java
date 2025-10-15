@@ -23,8 +23,6 @@ public class Alumno extends Usuario{
         horasBecaPendiente -= actividad.getHorasOtorgadasActividad();
     }
 
-
-
     public int getHorasPendientes(){
         return horasBecaPendiente;
     }

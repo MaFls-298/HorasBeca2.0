@@ -1,12 +1,48 @@
-import javax.swing.*;
+HISTORIAL HORAS
 
-public class MainHorasBeca{
+/**
+ * Autor: Estefanie 251610
+ * Programa: Horas Beca
+ * Fecha de creación: 31/08/2025
+ */
 
-    private static UsuarioController usuarioController = new UsuarioController();
+public class HistorialHoras {
+    public String correoAlumno;
+    public String nombreActividad;
+    public int horasAsignadas;
+    public String encargado;
+    public String fecha;
 
-    public static void main(String[] args) {
-        
-        // USUARIOS EJEMPLO
+    public HistorialHoras(String correoAlumno, String nombreActividad, int horasAsignadas, String encargado,
+            String fecha) {
+        this.correoAlumno = correoAlumno;
+        this.nombreActividad = nombreActividad;
+        this.horasAsignadas = horasAsignadas;
+        this.encargado = encargado;
+        this.fecha = fecha;
+    }
+}
+
+
+
+
+
+
+/*
+    public String getUserType() {
+        return this.tipoUsuario;
+    }
+
+    public String getUserInfo() {
+        return "Carnet: " + carnetUser + ", Nombre: " + nombreUser +
+            ", Correo: " + emailInstitucional + ", Tipo: " + tipoUsuario;
+    }
+}
+*/
+
+----------------------
+
+// USUARIOS EJEMPLO
         Alumno alumno1 = new Alumno(221010, "Pancracio", "p@uvg.edu", "6666", 50);
         Encargado encargado1 = new Encargado(111477, "Florinda", "fl@uvg.edu", "abcd", "Biiologia");
         usuarioController.registrarUsuario(alumno1);
@@ -124,4 +160,3 @@ public class MainHorasBeca{
         encargadoFrame.add(panel);
         encargadoFrame.setVisible(true);
     }
-}

@@ -1,3 +1,4 @@
+package model;
 public class Alerta{
     private String mensajeAlerta;
     private boolean leida;

@@ -1,3 +1,5 @@
+package model;
+
 public class Encargado extends Usuario{
     private String departamento;
     

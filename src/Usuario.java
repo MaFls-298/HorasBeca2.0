@@ -1,3 +1,5 @@
+package model;
+
 public abstract class Usuario {
     protected int carnetUser;
     protected String nombreUser;

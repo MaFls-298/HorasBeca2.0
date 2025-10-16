@@ -1,3 +1,5 @@
+package ui;
+
 import java.awt.*;
 import java.sql.*;
 import javax.swing.*;

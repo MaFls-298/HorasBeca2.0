@@ -1,11 +1,8 @@
 package ui;
+import database.DbConnection;
 import java.awt.*;
 import java.sql.*;
 import javax.swing.*;
-
-import database.DbConnection;
-//test ui con db — ia
-
     
 public class LoginUserView extends JFrame {
 
@@ -14,7 +11,7 @@ public class LoginUserView extends JFrame {
     private JComboBox<String> userTypeBox;
 
     public LoginUserView() {
-        setTitle("Inicio de Sesión - Sistema de Usuarios");
+        setTitle("Inicio de Sesión - Sistema de Horas Beca UVG");
         setSize(400, 250);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -73,11 +70,11 @@ public class LoginUserView extends JFrame {
             if (rs.next()) {
                 String nombre = rs.getString("nombreUser");
                 JOptionPane.showMessageDialog(this,
-                        "✅ Bienvenido " + nombre + " (" + tipoUsuario + ")",
+                        "Bienvenido " + nombre + " (" + tipoUsuario + ")",
                         "Acceso concedido", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this,
-                        "❌ Credenciales incorrectas o tipo de usuario inválido.",
+                        "Credenciales incorrectas o tipo de usuario inválido.",
                         "Acceso denegado", JOptionPane.ERROR_MESSAGE);
             }
 

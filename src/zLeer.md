@@ -12,15 +12,14 @@ java -cp ".;lib/sqlite-jdbc-3.50.3.0.jar" Main
 java -cp "bin;lib/sqlite-jdbc-3.50.3.0.jar" Main
 
 
+conexion a sqlite y ui de login funcional
 
 
-**No poner prints en las clases ni controladores**
+usuarios test guardados:
+Encargado Ejemplo | mail@uvg | 6666 |
+Alumno Ejemplo | mail@mail.edu | password |
 
-Subir todo a la branch "master" porque al crear otra rama subiendo archivos separados se crea conflicto de historiales 
-
-
-
-Tu dices rana y yo salto <3 jajaja me dices en que puedo ayudarte con tus clases, si quieres!
+**Subir todo a la branch "master" porque al crear otra rama subiendo archivos separados se crea conflicto de historiales** 
 
 
 Hagan el resto ustedes. yo y mi chatgpt ya hicimos mucho 🤑

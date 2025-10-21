@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Horas Beca - Interfaz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #004080;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background :white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .user-type {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    button {
+      background-color: #004080;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #0066cc;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #e6f0ff;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Horas Beca - UVG</h1>
+
+  <div class="container">
+    <div class="user-type">
+      <label>Selecciona tipo de usuario: </label>
+      <select id="tipoUsuario" onchange="mostrarVista()">
+        <option value="alumno">Alumno</option>
+        <option value="encargado">Encargado</option>
+      </select>
+    </div>
+
+    <!-- Vista alumno -->
+    <div id="alumno">
+      <h2>Panel del Alumno</h2>
+      <h3>Actividades disponibles</h3>
+      <table>
+        <tr><th>Título</th><th>Descripción</th><th>Horas</th><th>Cupo</th><th>Acción</th></tr>
+        <tr><td>Apoyo Biblioteca</td><td>Clasificación de libros</td><td>4</td><td>2/5</td><td><button>Inscribirse</button></td></tr>
+      </table>
+
+      <h3>Horas acumuladas</h3>
+      <p>Total: <strong>18 / 40 horas</strong></p>
+
+      <h3>Historial</h3>
+      <table>
+        <tr><th>Actividad</th><th>Encargado</th><th>Horas</th><th>Fecha</th></tr>
+        <tr><td>Apoyo en Laboratorio</td><td>Lic. Pérez</td><td>5</td><td>12/08/2025</td></tr>
+      </table>
+    </div>
+
+    <!-- Vista encargado -->
+    <div id="encargado" class="hidden">
+      <h2>Panel del Encargado</h2>
+      <h3>Publicar nueva actividad</h3>
+      <label>Título: </label><input type="text"><br>
+      <label>Descripción: </label><input type="text"><br>
+      <label>Horas: </label><input type="number"><br>
+      <label>Cupo: </label><input type="number"><br>
+      <button>Publicar</button>
+
+      <h3>Validar asistencia</h3>
+      <table>
+        <tr><th>Alumno</th><th>Actividad</th><th>Horas</th><th>Acción</th></tr>
+        <tr><td>María Flores</td><td>Biblioteca</td><td>4</td><td><button>Confirmar</button></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    function mostrarVista() {
+      const tipo = document.getElementById("tipoUsuario").value;
+      document.getElementById("alumno").classList.toggle("hidden", tipo !== "alumno");
+      document.getElementById("encargado").classList.toggle("hidden", tipo !== "encargado");
+    }
+  </script>
+</body>
+</html>

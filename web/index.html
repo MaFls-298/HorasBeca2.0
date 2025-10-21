@@ -5,7 +5,7 @@
     <title>Login Usuarios</title>
     <style>
     body {
-        font-family: Arial, sans-serif;
+        font-family: Verdana, sans-serif;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -20,34 +20,45 @@
 </head>
 <body>
     <h2>Iniciar Sesión</h2>
-    <input id="email" type="email" placeholder="Correo institucional">
-    <input id="password" type="password" placeholder="Contraseña">
+      <input id="email" type="email" placeholder="Correo Institucional">
+      <input id="password" type="password" placeholder="Contraseña">
     <select id="tipoUsuario">
-    <option>Alumno</option>
-    <option>Encargado</option>
-  </select>
-  <button onclick="login()">Iniciar Sesión</button>
+      <option>Alumno</option>
+      <option>Encargado</option>
+    </select>
+    <button onclick="login()">Iniciar Sesión</button>
+
 
   <p id="resultado"></p>
 
   <script>
-    async function login() {
-      const body = {
-        email: document.getElementById('email').value,
-        password: document.getElementById('password').value,
-        tipoUsuario: document.getElementById('tipoUsuario').value
-      };
-
+    //javascript
+    async function login(){ 
+      const body = { 
+        email: document.getElementById('email').value, 
+        password: document.getElementById('password').value, 
+        tipoUsuario: document.getElementById('tipoUsuario').value 
+      }; 
+        
       const res = await fetch('/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
+      
       const data = await res.json();
 
-      document.getElementById('resultado').textContent =
-        data.success ? `✅ Bienvenido, ${data.nombre}` : "😡 Credenciales inválidas";
-    }
+      if (data.success) {
+        
+        localStorage.setItem('nombreUser', data.nombre);
+        localStorage.setItem('tipoUsuario', data.tipoUsuario);
+        
+        window.location.href = '/interfazUsuarios.html';
+      } else {
+        document.getElementById('resultado').textContent = "❌ Credenciales inválidas";
+      }
+      }
+  
   </script>
-</body>
+  </body>
 </html>

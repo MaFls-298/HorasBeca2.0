@@ -21,6 +21,7 @@ public class WebServer {
 
             boolean success = false;
             String nombre = "";
+            String tipoUsuario = body.tipoUsuario;
 
             try (Connection conn = DbConnection.getConnection()) {
                 String sql = "SELECT nombreUser FROM usuarios WHERE emailInstitucional=? AND passwordUser=? AND tipoUsuario=?";
@@ -50,10 +51,11 @@ public class WebServer {
 
     static class LoginResponse {
         boolean success;
-        String nombre;
-        LoginResponse(boolean success, String nombre) {
+        String tipoUsuario;
+        LoginResponse(boolean success, String nombre, String tipoUsuario) {
             this.success = success;
             this.nombre = nombre;
+            this.tipoUsuario = tipoUsuario;
         }
     }
 }

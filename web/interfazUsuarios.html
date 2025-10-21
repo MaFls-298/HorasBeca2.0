@@ -111,6 +111,24 @@
       document.getElementById("alumno").classList.toggle("hidden", tipo !== "alumno");
       document.getElementById("encargado").classList.toggle("hidden", tipo !== "encargado");
     }
+
+    const tipoUsuario = localStorage.getItem('tipoUsuario');
+  const nombreUser = localStorage.getItem('nombreUser');
+
+  if (!nombreUser) {
+  
+  
+    window.location.href = '/index.html';
+  }
+
+  
+  const header = document.createElement('h3');
+  header.textContent = `Bienvenido, ${nombreUser}`;
+  document.querySelector('.container').prepend(header);
+
+  
+  document.getElementById("tipoUsuario").value = tipoUsuario;
+  mostrarVista();
   </script>
 </body>
 </html>

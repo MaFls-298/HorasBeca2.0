@@ -21,25 +21,27 @@ public class WebServer {
 
             boolean success = false;
             String nombre = "";
-            String tipoUsuario = body.tipoUsuario;
+            String tipoUsuario = "";
 
             try (Connection conn = DbConnection.getConnection()) {
-                String sql = "SELECT nombreUser FROM usuarios WHERE emailInstitucional=? AND passwordUser=? AND tipoUsuario=?";
+                String sql = "SELECT nombreUser, tipoUsuario FROM usuarios WHERE emailInstitucional=? AND passwordUser=? AND tipoUsuario=?";
                 PreparedStatement stmt = conn.prepareStatement(sql);
                 stmt.setString(1, body.email);
                 stmt.setString(2, body.password);
                 stmt.setString(3, body.tipoUsuario);
+                
 
                 ResultSet rs = stmt.executeQuery();
                 if (rs.next()) {
                     success = true;
                     nombre = rs.getString("nombreUser");
+                    tipoUsuario = rs.getString("tipoUsuario");
                 }
             } catch (SQLException e) {
                 System.out.println("Error en la database: " + e.getMessage());
             }
 
-            return gson.toJson(new LoginResponse(success, nombre));
+            return gson.toJson(new LoginResponse(success, nombre, tipoUsuario));
         });
     }
 
@@ -51,6 +53,7 @@ public class WebServer {
 
     static class LoginResponse {
         boolean success;
+        String nombre;
         String tipoUsuario;
         LoginResponse(boolean success, String nombre, String tipoUsuario) {
             this.success = success;

@@ -2,17 +2,17 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Horas Beca - Interfaz</title>
+  <title>Horas Beca</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: Verdana, sans-serif;
       background-color: #f4f6f9;
       margin: 0;
       padding: 20px;
     }
     h1 {
       text-align: center;
-      color: #004080;
+      color: #00801c;
     }
     .container {
       max-width: 900px;
@@ -22,12 +22,8 @@
       border-radius: 10px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    .user-type {
-      margin-bottom: 20px;
-      text-align: center;
-    }
     button {
-      background-color: #004080;
+      background-color: #008035;
       color: white;
       border: none;
       padding: 8px 12px;
@@ -36,7 +32,7 @@
       margin-top: 10px;
     }
     button:hover {
-      background-color: #0066cc;
+      background-color: #3acc00;
     }
     table {
       width: 100%;
@@ -49,10 +45,14 @@
       text-align: left;
     }
     th {
-      background-color: #e6f0ff;
+      background-color: #e6ffe7;
     }
     .hidden {
       display: none;
+    }
+    .logout {
+      text-align: right;
+      margin-bottom: 10px;
     }
   </style>
 </head>
@@ -60,13 +60,11 @@
   <h1>Horas Beca - UVG</h1>
 
   <div class="container">
-    <div class="user-type">
-      <label>Selecciona tipo de usuario: </label>
-      <select id="tipoUsuario" onchange="mostrarVista()">
-        <option value="alumno">Alumno</option>
-        <option value="encargado">Encargado</option>
-      </select>
+    <div class="logout">
+      <button onclick="logout()">Cerrar sesión</button>
     </div>
+
+    <h3 id="bienvenida"></h3>
 
     <!-- Vista alumno -->
     <div id="alumno">
@@ -100,35 +98,39 @@
       <h3>Validar asistencia</h3>
       <table>
         <tr><th>Alumno</th><th>Actividad</th><th>Horas</th><th>Acción</th></tr>
-        <tr><td>María Flores</td><td>Biblioteca</td><td>4</td><td><button>Confirmar</button></td></tr>
+        <tr><td>Maria e</td><td>Biblioteca</td><td>4</td><td><button>Confirmar</button></td></tr>
       </table>
     </div>
   </div>
 
   <script>
-    function mostrarVista() {
-      const tipo = document.getElementById("tipoUsuario").value;
-      document.getElementById("alumno").classList.toggle("hidden", tipo !== "alumno");
-      document.getElementById("encargado").classList.toggle("hidden", tipo !== "encargado");
+    const tipoUsuario = localStorage.getItem('tipoUsuario');
+    const nombreUser = localStorage.getItem('nombreUser');
+
+    
+    if (!nombreUser || !tipoUsuario) {
+      window.location.href = '/index.html';
     }
 
-    const tipoUsuario = localStorage.getItem('tipoUsuario');
-  const nombreUser = localStorage.getItem('nombreUser');
+    
+    document.getElementById("bienvenida").textContent = `Bienvenido, ${nombreUser}`;
 
-  if (!nombreUser) {
-  
-  
-    window.location.href = '/index.html';
-  }
-
-  
-  const header = document.createElement('h3');
-  header.textContent = `Bienvenido, ${nombreUser}`;
-  document.querySelector('.container').prepend(header);
-
-  
-  document.getElementById("tipoUsuario").value = tipoUsuario;
-  mostrarVista();
+    
+    if (tipoUsuario === "Alumno") {
+      document.getElementById("alumno").classList.remove("hidden");
+      document.getElementById("encargado").classList.add("hidden");
+      
+    } else {
+      document.getElementById("encargado").classList.remove("hidden");
+      document.getElementById("alumno").classList.add("hidden");
+      
+    }
+    
+    
+    function logout() {
+      localStorage.clear();
+      window.location.href = '/index.html';
+    }
   </script>
 </body>
 </html>

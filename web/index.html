@@ -47,7 +47,8 @@
       });
       
       const data = await res.json();
-
+      
+      console.log("Respuesta del servidor:", data);
       if (data.success) {
         
         localStorage.setItem('nombreUser', data.nombre);
@@ -55,10 +56,11 @@
         
         window.location.href = '/interfazUsuarios.html';
       } else {
-        document.getElementById('resultado').textContent = "❌ Credenciales inválidas";
+        document.getElementById('resultado').textContent = "😡 Credenciales inválidas";
       }
       }
   
   </script>
   </body>
 </html>
+

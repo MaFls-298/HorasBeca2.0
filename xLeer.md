@@ -11,7 +11,7 @@ javac -cp "lib/*;src" src/server/WebServer.java -d bin
 java -cp "lib/*;bin" server.WebServer
 localhost:8080
 
-conexion a sqlite y ui de login funcional
+conexion a sqlite y ui de login funcional 100% segura
 
 
 usuarios test guardados:

@@ -3,15 +3,16 @@ sqlite3 UsuariosDB.db
 tabla: usuarios
 SELECT * FROM usuarios;
 
+
 →Terminal
-javac -cp "lib/*;src" src/server/WebServer.java -d bin
+javac -cp "lib/*;src" -d bin src/server/WebServer.java src/database/DbConnection.java
 
 
 →run
 java -cp "lib/*;bin" server.WebServer
 localhost:8080
 
-conexion a sqlite y ui de login funcional 100% segura
+conexion a sqlite y ui de login funcional. info de los usuarios 100% segura
 
 
 usuarios test guardados:

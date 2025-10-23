@@ -24,18 +24,22 @@ public class WebServer {
             String tipoUsuario = "";
 
             try (Connection conn = DbConnection.getConnection()) {
-                String sql = "SELECT nombreUser, tipoUsuario FROM usuarios WHERE emailInstitucional=? AND passwordUser=? AND tipoUsuario=?";
+                String sql = "SELECT nombreUser, tipoUsuario FROM usuarios WHERE emailInstitucional=? AND passwordUser=?";
                 PreparedStatement stmt = conn.prepareStatement(sql);
                 stmt.setString(1, body.email);
                 stmt.setString(2, body.password);
-                stmt.setString(3, body.tipoUsuario);
                 
+                System.out.println("Login attempt:");
+                System.out.println("Email: " + body.email);
+                System.out.println("Password: " + body.password);
+                System.out.println("TipoUsuario: " + body.tipoUsuario);
 
                 ResultSet rs = stmt.executeQuery();
                 if (rs.next()) {
                     success = true;
                     nombre = rs.getString("nombreUser");
                     tipoUsuario = rs.getString("tipoUsuario");
+                                        
                 }
             } catch (SQLException e) {
                 System.out.println("Error en la database: " + e.getMessage());

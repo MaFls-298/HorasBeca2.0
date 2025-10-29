@@ -17,7 +17,7 @@
     .container {
       max-width: 900px;
       margin: auto;
-      background :white;
+      background: white;
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -54,6 +54,19 @@
       text-align: right;
       margin-bottom: 10px;
     }
+    #notificaciones {
+      background-color: #f8fff8;
+      border: 1px solid #b5e7b0;
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 15px;
+    }
+    .alerta {
+      background: #eaffea;
+      border-left: 4px solid #00801c;
+      margin: 6px 0;
+      padding: 6px;
+    }
   </style>
 </head>
 <body>
@@ -66,7 +79,6 @@
 
     <h3 id="bienvenida"></h3>
 
-    <!-- Vista alumno ejemplo-->
     <div id="alumno">
       <h2>Panel del Alumno</h2>
       <h3>Actividades disponibles</h3>
@@ -83,9 +95,14 @@
         <tr><th>Actividad</th><th>Encargado</th><th>Horas</th><th>Fecha</th></tr>
         <tr><td>Apoyo en Laboratorio</td><td>Lic. Pérez</td><td>5</td><td>12/08/2025</td></tr>
       </table>
+
+      <h3>Notificaciones</h3>
+      <div id="notificaciones">
+        <div class="alerta">Te faltan <strong>22 horas beca</strong> para completar tu semestre.</div>
+        <div class="alerta">Nueva actividad publicada: <strong>Apoyo en Biblioteca</strong> (4 horas).</div>
+      </div>
     </div>
 
-    <!-- Vista encargado -->
     <div id="encargado" class="hidden">
       <h2>Panel del Encargado</h2>
       <h3>Publicar nueva actividad</h3>
@@ -107,27 +124,20 @@
     const tipoUsuario = localStorage.getItem('tipoUsuario');
     const nombreUser = localStorage.getItem('nombreUser');
 
-    
     if (!nombreUser || !tipoUsuario) {
       window.location.href = '/index.html';
     }
 
-    
     document.getElementById("bienvenida").textContent = `Bienvenido, ${nombreUser}`;
 
-    
     if (tipoUsuario === "Encargado") {
       document.getElementById("encargado").classList.remove("hidden");
       document.getElementById("alumno").classList.add("hidden");
-      console.log(localStorage.getItem('tipoUsuario'));
-
     } else {
       document.getElementById("alumno").classList.remove("hidden");
       document.getElementById("encargado").classList.add("hidden");
-      console.log(localStorage.getItem('tipoUsuario'));
     }
-    
-    
+
     function logout() {
       localStorage.clear();
       window.location.href = '/index.html';

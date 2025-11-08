@@ -4,12 +4,9 @@ tabla: usuarios
 SELECT * FROM usuarios;
 
 
-→Terminal
-javac -cp "lib/*;src" -d bin src/server/WebServer.java src/database/DbConnection.java
-
-
 →run
-java -cp "lib/*;bin" server.WebServer
+mvn exec:java 
+
 localhost:8080
 
 conexion a sqlite y ui de login funcional. info de los usuarios 100% segura

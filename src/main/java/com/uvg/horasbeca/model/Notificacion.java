@@ -46,7 +46,7 @@ public class Notificacion {
 
     public static Alerta generarAlertaActividad(Actividad actividad) {
         String mensaje = "Nueva actividad disponible: " + actividad.getTitulo() + 
-                         " (" + actividad.getHorasOtorgadas() + " horas).";
+                        " (" + actividad.getHorasOtorgadas() + " horas).";
         return new Alerta(null, mensaje);
     }
 }

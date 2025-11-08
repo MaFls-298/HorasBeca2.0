@@ -23,7 +23,6 @@ public class WebServer {
 
         post("/login", (req, res) -> {
             res.type("application/json");
-            //Gson gson = new Gson();
 
             LoginRequest body = gson.fromJson(req.body(), LoginRequest.class);
 

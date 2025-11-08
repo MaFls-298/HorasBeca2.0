@@ -1,0 +1,6 @@
+com\uvg\horasbeca\database\DbConnection.class
+com\uvg\horasbeca\database\ActividadController.class
+com\uvg\horasbeca\server\WebServer.class
+com\uvg\horasbeca\server\WebServer$LoginRequest.class
+com\uvg\horasbeca\server\WebServer$LoginResponse.class
+com\uvg\horasbeca\model\Actividad.class

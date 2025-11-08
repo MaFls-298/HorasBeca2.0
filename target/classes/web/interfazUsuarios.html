@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Horas Beca</title>
+  <style>
+    body {
+      font-family: Verdana, sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #00801c;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    button {
+      background-color: #008035;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #3acc00;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #e6ffe7;
+    }
+    .hidden {
+      display: none;
+    }
+    .logout {
+      text-align: right;
+      margin-bottom: 10px;
+    }
+    #notificaciones {
+      background-color: #f8fff8;
+      border: 1px solid #b5e7b0;
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 15px;
+    }
+    .alerta {
+      background: #eaffea;
+      border-left: 4px solid #00801c;
+      margin: 6px 0;
+      padding: 6px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Horas Beca - UVG</h1>
+
+  <div class="container">
+    <div class="logout">
+      <button onclick="logout()">Cerrar sesión</button>
+    </div>
+
+    <h3 id="bienvenida"></h3>
+
+    <div id="alumno">
+      <h2>Panel del Alumno</h2>
+      <h3>Actividades disponibles</h3>
+      <table>
+        <tr><th>Título</th><th>Descripción</th><th>Horas</th><th>Cupo</th><th>Acción</th></tr>
+        <tr><td>Apoyo Biblioteca</td><td>Clasificación de libros</td><td>4</td><td>2/5</td><td><button>Inscribirse</button></td></tr>
+      </table>
+
+      <h3>Horas acumuladas</h3>
+      <p>Total: <strong>18 / 40 horas</strong></p>
+
+      <h3>Historial</h3>
+      <table>
+        <tr><th>Actividad</th><th>Encargado</th><th>Horas</th><th>Fecha</th></tr>
+        <tr><td>Apoyo en Laboratorio</td><td>Lic. Pérez</td><td>5</td><td>12/08/2025</td></tr>
+      </table>
+
+      <h3>Notificaciones</h3>
+      <div id="notificaciones">
+        <div class="alerta">Te faltan <strong>22 horas beca</strong> para completar tu semestre.</div>
+        <div class="alerta">Nueva actividad publicada: <strong>Apoyo en Biblioteca</strong> (4 horas).</div>
+      </div>
+    </div>
+
+    <div id="encargado" class="hidden">
+      <h2>Panel del Encargado</h2>
+      <h3>Publicar nueva actividad</h3>
+      <label>Título: </label><input type="text" id="titulo"><br>
+      <label>Descripción: </label><input type="text" id="descripcion"><br>
+      <label>Horas: </label><input type="number" id="horas"><br>
+      <label>Cupo: </label><input type="number" id="cupo"><br>
+      <label>Fecha: </label><input type="date" id="fecha"><br>
+      <label>Hora: </label><input type="time" id="hora"><br>
+      <button onclick="publicarActividad()">Publicar</button>
+
+      <h3>Validar asistencia</h3>
+      <table>
+        <tr><th>Alumno</th><th>Actividad</th><th>Horas</th><th>Acción</th></tr>
+        <tr><td>Maria e</td><td>Biblioteca</td><td>4</td><td><button>Confirmar</button></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const tipoUsuario = localStorage.getItem('tipoUsuario');
+    const nombreUser = localStorage.getItem('nombreUser');
+
+    if (!nombreUser || !tipoUsuario) {
+      window.location.href = '/index.html';
+    }
+
+    document.getElementById("bienvenida").textContent = `Bienvenido, ${nombreUser}`;
+
+    if (tipoUsuario === "Encargado") {
+      document.getElementById("encargado").classList.remove("hidden");
+      document.getElementById("alumno").classList.add("hidden");
+    } else {
+      document.getElementById("alumno").classList.remove("hidden");
+      document.getElementById("encargado").classList.add("hidden");
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = '/index.html';
+    }
+
+    async function publicarActividad() {
+      const body = {
+        titulo: document.getElementById("titulo").value,
+        descripcion: document.getElementById("descripcion").value,
+        horasOtorgadas: parseInt(document.getElementById("horas").value),
+        cupoMaximo: parseInt(document.getElementById("cupo").value),
+        fechaActividad: document.getElementById("fecha").value,
+        horaActividad: document.getElementById("hora").value,
+        encargadoId: localStorage.getItem("carnetUser")
+      };
+
+      const res = await fetch('/actividades', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      const data = await res.json();
+      alert(data.success ? "Actividad publicada" : "Error publicando actividad");
+    }
+  </script>
+</body>
+</html>

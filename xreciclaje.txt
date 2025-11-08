@@ -1,44 +1,3 @@
-HISTORIAL HORAS
-
-/**
- * Autor: Estefanie 251610
- * Programa: Horas Beca
- * Fecha de creación: 31/08/2025
- */
-
-public class HistorialHoras {
-    public String correoAlumno;
-    public String nombreActividad;
-    public int horasAsignadas;
-    public String encargado;
-    public String fecha;
-
-    public HistorialHoras(String correoAlumno, String nombreActividad, int horasAsignadas, String encargado,
-            String fecha) {
-        this.correoAlumno = correoAlumno;
-        this.nombreActividad = nombreActividad;
-        this.horasAsignadas = horasAsignadas;
-        this.encargado = encargado;
-        this.fecha = fecha;
-    }
-}
-
-
-
-
-
-
-/*
-    public String getUserType() {
-        return this.tipoUsuario;
-    }
-
-    public String getUserInfo() {
-        return "Carnet: " + carnetUser + ", Nombre: " + nombreUser +
-            ", Correo: " + emailInstitucional + ", Tipo: " + tipoUsuario;
-    }
-}
-*/
 
 ----------------------
 package ui;
@@ -247,4 +206,58 @@ public class LoginUserView extends JFrame {
 
         encargadoFrame.add(panel);
         encargadoFrame.setVisible(true);
+    }
+
+
+-----------------------------------
+
+private ArrayList<Actividad> actividadesList;
+
+    public ActividadController() {
+        this.actividadesList = new ArrayList<>();
+    }
+
+
+    public void crearActividad(Actividad actividad) {
+        actividadesList.add(actividad);
+    }
+
+    public Actividad searchActividadName(String tituloActividad) {
+        for (Actividad actividad : actividadesList) {
+            if (actividad.getTituloActividad() == tituloActividad) {
+                return actividad;
+            }
+        }
+        return null;
+    }
+
+    public Actividad searchActividadId(int idActividad) {
+        for (Actividad actividad : actividadesList) {
+            if (actividad.getIdActividad() == idActividad) {
+                return actividad;
+            }
+        }
+        return null;
+    }
+
+    public boolean inscribirAlumno(Alumno alumno, String tituloActividad) {
+        Actividad act = searchActividadName(tituloActividad);
+        if (act != null && act.verStateActividad()){
+            act.inscribirAlumno(alumno);
+            alumno.agregarActividad(act);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean validarHorasAlumno(Alumno alumno, int idActividad) {
+        Actividad act = searchActividadId(idActividad);
+        if (act != null && alumno.getActivRealizadasList().contains(act)) {
+            return true;
+        }
+        return false;
+    }
+
+    public ArrayList<Actividad> getTodasActividades() {
+        return actividadesList;
     }

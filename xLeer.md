@@ -9,7 +9,7 @@ mvn exec:java
 
 localhost:8080
 
-conexion a sqlite y ui de login funcional. info de los usuarios 100% segura
+conexion a sqlite y ui de login funcional. info de los usuarios 100% segura 
 
 
 usuarios test guardados:

@@ -29,7 +29,6 @@
   <p id="resultado"></p>
 
   <script>
-    //javascript
     async function login(){ 
       const body = { 
         email: document.getElementById('email').value, 
@@ -47,13 +46,22 @@
       console.log("Res. server:", data);
       if (data.success) {
         
-        localStorage.setItem('nombreUser', data.nombre);
-        localStorage.setItem('tipoUsuario', data.tipoUsuario);
-        
-        window.location.href = '/interfazUsuarios.html';
-      } else {
-        document.getElementById('resultado').textContent = "😡 Credenciales inválidas";
+        localStorage.setItem('usuario', JSON.stringify({
+        id: data.id,
+        nombre: data.nombre,       
+        tipoUsuario: data.tipoUsuario, 
+        email: data.email  
+      }));
+
+    
+      if (data.tipoUsuario === "Encargado") {
+        window.location.href = 'encargado.html';
+      } else if (data.tipoUsuario === "alumno") {
+        window.location.href = 'Alumno.html';
       }
+        } else {
+          document.getElementById('resultado').textContent = "😡 Credenciales inválidas";
+        }
       }
   
   </script>

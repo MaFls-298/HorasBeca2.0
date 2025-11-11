@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Encargado - Horas Beca</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>Panel del Encargado</h1>
+  <div class="container">
+    <div class="logout">
+      <button onclick="logout()">Cerrar sesión</button>
+    </div>
+  <p>Bienvenido, <span id="encargadoNombre"></span></p>
+
+  <section>
+    <h2>Publicar nueva actividad</h2>
+    <form id="formNuevaActividad">
+      <input type="text" id="titulo" placeholder="Título" required><br>
+      <textarea id="descripcion" placeholder="Descripción" required></textarea><br>
+      <input type="number" id="horas" placeholder="Horas otorgadas" required><br>
+      <input type="number" id="cupoMaximo" placeholder="Cupo máximo" required><br>
+      <input type="date" id="fecha" required><br>
+      <input type="time" id="hora" required><br>
+      <button type="button" onclick="publicarActividad()">Publicar</button>
+    </form>
+  </section>
+
+  <section>
+    <h2>Actividades publicadas</h2>
+    <table id="tablaActividades">
+      <tr>
+        <th>ID</th><th>Título</th><th>Fecha</th><th>Cupo</th><th>Acciones</th>
+      </tr>
+    </table>
+  </section>
+
+  <script>
+    
+    const usuario = JSON.parse(localStorage.getItem('usuario'))
+    
+    const encargadoId = usuario.id;
+    document.getElementById("encargadoNombre").textContent = usuario.nombre;
+
+    async function publicarActividad() {
+      const fechaInput = document.getElementById("fecha").value; 
+      const horaInput = document.getElementById("hora").value;
+
+    const actividad = {
+        titulo: document.getElementById("titulo").value,
+        descripcion: document.getElementById("descripcion").value,
+        horasOtorgadas: parseInt(document.getElementById("horas").value),
+        cupoMaximo: parseInt(document.getElementById("cupoMaximo").value),
+        cupoUsado: 0,
+        fechaActividad: fechaInput,
+        horaActividad: horaInput,
+        encargadoId: encargadoId,
+        actividadState: true
+    };
+    
+    console.log("actvidad log:", actividad);
+
+      try {
+          const res = await fetch("/actividades", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(actividad)
+          });
+
+          console.log("Response status:", res.status); // log
+          
+          const data = await res.json();
+          console.log("Response data:", data); // log
+          
+          if (data.success) {
+              alert("✅ Actividad publicada correctamente");
+              listarActividades(); // refresh
+              document.getElementById("formNuevaActividad").reset();
+          } else {
+              alert("❌ Error al publicar: " + data.error);
+          }
+      } catch (error) {
+          console.error("Fetch error:", error);
+          alert("❌ Error de conexion");
+      }
+    }
+
+    
+    async function listarActividades() {
+    const res = await fetch("/actividades");
+    const actividades = await res.json();
+
+    const tabla = document.getElementById("tablaActividades");
+    tabla.innerHTML = `
+        <tr>
+        <th>Título</th>
+        <th>Fecha</th>
+        <th>Hora</th>
+        <th>Cupo</th>
+        <th>Acción</th>
+        </tr>`;
+
+    actividades
+        .filter(a => a.encargadoId === encargadoId)
+        .forEach(act => {
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+            <td>${act.titulo}</td>
+            <td>${act.fechaActividad}</td>
+            <td>${act.horaActividad}</td>
+            <td>${act.cupoUsado}/${act.cupoMaximo}</td>
+            <td><button onclick="verAlumnos(${act.id})">Ver alumnos</button></td>
+        `;
+        tabla.appendChild(fila);
+        });
+    }
+
+    
+    async function verAlumnos(actividadId) {
+    const res = await fetch(`/actividades/${actividadId}/alumnos`);
+    const alumnos = await res.json();
+
+    const contenedor = document.getElementById("alumnosInscritos");
+    contenedor.innerHTML = `<h3>Alumnos inscritos</h3>`;
+
+    if (alumnos.length === 0) {
+        contenedor.innerHTML += `<p>No hay alumnos inscritos.</p>`;
+        return;
+    }
+
+    const tabla = document.createElement("table");
+    tabla.innerHTML = `
+        <tr>
+        <th>Alumno</th>
+        <th>Horas</th>
+        <th>Asistencia</th>
+        <th>Acción</th>
+        </tr>
+    `;
+
+    alumnos.forEach(al => {
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+        <td>${al.nombre}</td>
+        <td>${al.horasRealizadas}</td>
+        <td>${al.asistenciaValidada ? "✅" : "❌"}</td>
+        <td>
+            ${!al.asistenciaValidada
+            ? `<button onclick="validarAsistencia(${actividadId}, ${al.id})">Validar</button>`
+            : ""}
+        </td>
+        `;
+        tabla.appendChild(fila);
+    });
+
+    contenedor.appendChild(tabla);
+    }
+
+    
+    async function validarAsistencia(actividadId, alumnoId) {
+      const res = await fetch(`/actividades/${actividadId}/validar/${alumnoId}`, {
+          method: "POST"
+      });
+      const data = await res.json();
+
+      if (data.success) {
+          alert("✅ Asistencia validada");
+          verAlumnos(actividadId);
+      } else {
+          alert("❌ Error: " + data.error);
+      }
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = '/index.html';
+    }
+
+    document.addEventListener("DOMContentLoaded", listarActividades);
+
+
+
+
+  </script>
+</body>
+</html>

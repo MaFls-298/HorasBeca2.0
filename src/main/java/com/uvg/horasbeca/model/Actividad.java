@@ -1,18 +1,15 @@
 package com.uvg.horasbeca.model;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-
 public class Actividad {
-    public final int id;
+    public int id;
     public String titulo;
     public String descripcion;
     public int horasOtorgadas;
     public int cupoMaximo;
     public int cupoUsado;
-    public LocalDate fechaActividad;
-    public LocalTime horaActividad;
-    public final int encargadoId;
+    public String fechaActividad;
+    public String horaActividad;
+    public int encargadoId;
     public boolean actividadState;
 
     public Actividad(){
@@ -20,8 +17,8 @@ public class Actividad {
         this.encargadoId = 0;
     }
     
-    //instancia de tabla de la db
-    public Actividad(int id, String titulo, String descripcion, int horasOtorgadas, int cupoMaximo, int cupoUsado, LocalDate fechaActividad, LocalTime horaActividad, int encargadoId, boolean actividadState){
+    
+    public Actividad(int id, String titulo, String descripcion, int horasOtorgadas, int cupoMaximo, int cupoUsado, String fechaActividad, String horaActividad, int encargadoId, boolean actividadState){
         this.id = id;
         this.titulo = titulo;
         this.descripcion = descripcion;
@@ -35,7 +32,7 @@ public class Actividad {
     }
 
     //nueva act
-    public Actividad(String titulo, String descripcion, int horasOtorgadas, int cupoMaximo, LocalDate fechaActividad, LocalTime horaActividad, int encargadoId){
+    public Actividad(String titulo, String descripcion, int horasOtorgadas, int cupoMaximo, String fechaActividad, String horaActividad, int encargadoId){
         this.id = 0;
         this.titulo = titulo;
         this.descripcion = descripcion;
@@ -73,11 +70,11 @@ public class Actividad {
         this.cupoUsado = cupoUsado; 
     }
 
-    public void setFechaActividad(LocalDate fechaActividad){ 
+    public void setFechaActividad(String fechaActividad){ 
         this.fechaActividad = fechaActividad; 
     }
 
-    public void setHoraActividad(LocalTime horaActividad) { 
+    public void setHoraActividad(String horaActividad) { 
         this.horaActividad = horaActividad; 
     }
 
@@ -108,11 +105,11 @@ public class Actividad {
         return cupoUsado; 
     }
 
-    public LocalDate getFechaActividad(){
+    public String getFechaActividad(){
         return fechaActividad;
     }
 
-    public LocalTime getHoraActividad(){
+    public String getHoraActividad(){
         return horaActividad;
     }
 

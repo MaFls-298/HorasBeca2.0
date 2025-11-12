@@ -5,182 +5,107 @@
   <title>Panel Encargado - Horas Beca</title>
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
   <h1>Panel del Encargado</h1>
   <div class="container">
-    <div class="logout">
-      <button onclick="logout()">Cerrar sesión</button>
-    </div>
+    
   <p>Bienvenido, <span id="encargadoNombre"></span></p>
 
-  <section>
-    <h2>Publicar nueva actividad</h2>
-    <form id="formNuevaActividad">
-      <input type="text" id="titulo" placeholder="Título" required><br>
-      <textarea id="descripcion" placeholder="Descripción" required></textarea><br>
-      <input type="number" id="horas" placeholder="Horas otorgadas" required><br>
-      <input type="number" id="cupoMaximo" placeholder="Cupo máximo" required><br>
-      <input type="date" id="fecha" required><br>
-      <input type="time" id="hora" required><br>
-      <button type="button" onclick="publicarActividad()">Publicar</button>
-    </form>
-  </section>
+<!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-button active" onclick="openTab('publicar')">Publicar Actividad</button>
+    <button class="tab-button" onclick="openTab('actividades')">Mis Actividades</button>
+    <button class="tab-button" onclick="openTab('detalles')">Detalles de Actividad</button>
+  </div>
 
-  <section>
-    <h2>Actividades publicadas</h2>
-    <table id="tablaActividades">
-      <tr>
-        <th>ID</th><th>Título</th><th>Fecha</th><th>Cupo</th><th>Acciones</th>
-      </tr>
-    </table>
-  </section>
+    <!-- Publicar Actividad -->
+  <div id="publicar" class="tab-content active">
+    <section>
+      <h2>Publicar nueva actividad</h2>
+      <form id="formNuevaActividad">
+        <input type="text" id="titulo" placeholder="Título" required><br>
+        <textarea id="descripcion" placeholder="Descripción" required></textarea><br>
+        <input type="number" id="horas" placeholder="Horas otorgadas" required><br>
+        <input type="number" id="cupoMaximo" placeholder="Cupo máximo" required><br>
+        <input type="date" id="fecha" required><br>
+        <input type="time" id="hora" required><br>
+        <button type="button" onclick="publicarActividad()">Publicar</button>
+      </form>
+    </section>
+  </div>
 
-  <script>
-    
-    const usuario = JSON.parse(localStorage.getItem('usuario'))
-    
-    const encargadoId = usuario.id;
-    document.getElementById("encargadoNombre").textContent = usuario.nombre;
+  <!-- Lista de Actividades -->
+  <div id="actividades" class="tab-content">
+    <section>
+      <h2>Mis Actividades Publicadas</h2>
+      <div id="listaActividadesContainer">
+        <table id="tablaActividades">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Cupo</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="actividadesBody">
+            <!-- Actividades ... -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
 
-    async function publicarActividad() {
-      const fechaInput = document.getElementById("fecha").value; 
-      const horaInput = document.getElementById("hora").value;
+  <!-- Detalles de Actividad -->
+  <div id="detalles" class="tab-content">
+    <section>
+      <h2>Detalles de Actividad</h2>
+      <div id="detallesActividadContainer" style="display: none;">
+        <div id="detallesActividad">
+          <!-- detalles -->
+        </div>
+        <div id="alumnosInscritos">
+          <!-- estudiiates -->
+        </div>
+        <button onclick="volverALista()">← Volver a la lista</button>
+        <button onclick="editarActividad()" id="btnEditar">✏️ Editar Actividad</button>
+        <button onclick="eliminarActividad()" id="btnEliminar" style="background-color: #dc3545;">🗑️ Eliminar Actividad</button>
+      </div>
+      <div id="sinSeleccion" style="text-align: center; padding: 2rem;">
+        <p>Selecciona una actividad para ver sus detalles</p>
+      </div>
+    </section>
+  </div>
 
-    const actividad = {
-        titulo: document.getElementById("titulo").value,
-        descripcion: document.getElementById("descripcion").value,
-        horasOtorgadas: parseInt(document.getElementById("horas").value),
-        cupoMaximo: parseInt(document.getElementById("cupoMaximo").value),
-        cupoUsado: 0,
-        fechaActividad: fechaInput,
-        horaActividad: horaInput,
-        encargadoId: encargadoId,
-        actividadState: true
-    };
-    
-    console.log("actvidad log:", actividad);
+  <!-- Editar Actividad -->
+  <div id="modalEditar" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+    <div style="background: white; margin: 5% auto; padding: 2rem; width: 80%; max-width: 600px; border-radius: 8px;">
+      <h2>Editar Actividad</h2>
+      <form id="formEditarActividad">
+        <input type="hidden" id="editarId">
+        <input type="text" id="editarTitulo" placeholder="Título" required><br>
+        <textarea id="editarDescripcion" placeholder="Descripción" required></textarea><br>
+        <input type="number" id="editarHoras" placeholder="Horas otorgadas" required><br>
+        <input type="number" id="editarCupoMaximo" placeholder="Cupo máximo" required><br>
+        <input type="date" id="editarFecha" required><br>
+        <input type="time" id="editarHora" required><br>
+        <button type="button" onclick="guardarEdicion()"> Guardar Cambios</button>
+        <button type="button" onclick="cerrarModal()" style="background-color: #6c7d70;">❌ Cancelar</button>
+      </form>
+    </div>
+  </div>
 
-      try {
-          const res = await fetch("/actividades", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(actividad)
-          });
+  <!-- logout -->
+  <div class="logout">
+      <button onclick="logout()">Cerrar sesión</button>
+    </div>
 
-          console.log("Response status:", res.status); // log
-          
-          const data = await res.json();
-          console.log("Response data:", data); // log
-          
-          if (data.success) {
-              alert("✅ Actividad publicada correctamente");
-              listarActividades(); // refresh
-              document.getElementById("formNuevaActividad").reset();
-          } else {
-              alert("❌ Error al publicar: " + data.error);
-          }
-      } catch (error) {
-          console.error("Fetch error:", error);
-          alert("❌ Error de conexion");
-      }
-    }
-
-    
-    async function listarActividades() {
-    const res = await fetch("/actividades");
-    const actividades = await res.json();
-
-    const tabla = document.getElementById("tablaActividades");
-    tabla.innerHTML = `
-        <tr>
-        <th>Título</th>
-        <th>Fecha</th>
-        <th>Hora</th>
-        <th>Cupo</th>
-        <th>Acción</th>
-        </tr>`;
-
-    actividades
-        .filter(a => a.encargadoId === encargadoId)
-        .forEach(act => {
-        const fila = document.createElement("tr");
-        fila.innerHTML = `
-            <td>${act.titulo}</td>
-            <td>${act.fechaActividad}</td>
-            <td>${act.horaActividad}</td>
-            <td>${act.cupoUsado}/${act.cupoMaximo}</td>
-            <td><button onclick="verAlumnos(${act.id})">Ver alumnos</button></td>
-        `;
-        tabla.appendChild(fila);
-        });
-    }
-
-    
-    async function verAlumnos(actividadId) {
-    const res = await fetch(`/actividades/${actividadId}/alumnos`);
-    const alumnos = await res.json();
-
-    const contenedor = document.getElementById("alumnosInscritos");
-    contenedor.innerHTML = `<h3>Alumnos inscritos</h3>`;
-
-    if (alumnos.length === 0) {
-        contenedor.innerHTML += `<p>No hay alumnos inscritos.</p>`;
-        return;
-    }
-
-    const tabla = document.createElement("table");
-    tabla.innerHTML = `
-        <tr>
-        <th>Alumno</th>
-        <th>Horas</th>
-        <th>Asistencia</th>
-        <th>Acción</th>
-        </tr>
-    `;
-
-    alumnos.forEach(al => {
-        const fila = document.createElement("tr");
-        fila.innerHTML = `
-        <td>${al.nombre}</td>
-        <td>${al.horasRealizadas}</td>
-        <td>${al.asistenciaValidada ? "✅" : "❌"}</td>
-        <td>
-            ${!al.asistenciaValidada
-            ? `<button onclick="validarAsistencia(${actividadId}, ${al.id})">Validar</button>`
-            : ""}
-        </td>
-        `;
-        tabla.appendChild(fila);
-    });
-
-    contenedor.appendChild(tabla);
-    }
-
-    
-    async function validarAsistencia(actividadId, alumnoId) {
-      const res = await fetch(`/actividades/${actividadId}/validar/${alumnoId}`, {
-          method: "POST"
-      });
-      const data = await res.json();
-
-      if (data.success) {
-          alert("✅ Asistencia validada");
-          verAlumnos(actividadId);
-      } else {
-          alert("❌ Error: " + data.error);
-      }
-    }
-
-    function logout() {
-      localStorage.clear();
-      window.location.href = '/index.html';
-    }
-
-    document.addEventListener("DOMContentLoaded", listarActividades);
-
-
-
-
-  </script>
+    <!-- /////////////////////////////////////// -->
+  
+  <script src="alumno.js"></script>
+  
 </body>
 </html>

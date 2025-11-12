@@ -7,8 +7,11 @@ import java.sql.SQLException;
 
 import com.google.gson.Gson;
 import com.uvg.horasbeca.controller.ActividadController;
+import com.uvg.horasbeca.controller.AlumnoController;
 import com.uvg.horasbeca.database.DbConnection;
 
+import static spark.Spark.before;
+import static spark.Spark.get;
 import static spark.Spark.port;
 import static spark.Spark.post;
 import static spark.Spark.staticFiles;
@@ -20,6 +23,14 @@ public class WebServer {
 
         staticFiles.location("/web");
         Gson gson = new Gson();
+
+        before((req, res) -> {
+            res.header("Access-Control-Allow-Origin", "*");
+            res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+            res.header("Access-Control-Allow-Headers", "Content-Type,Authorization,X-Requested-With,Content-Length,Accept,Origin,");
+        });
+
+        ///////////
 
         post("/login", (req, res) -> {
             res.type("application/json");
@@ -56,14 +67,24 @@ public class WebServer {
         });
 
         post("/actividades", ActividadController.crearActividad);
-        //get("/actividades", ActividadController.listarActividades);
-        //get("/actividades/:id", ActividadController.obtenerActividadPorId);
-        //get("/actividades/:id/alumnos", ActividadController.obtenerAlumnosInscritos);
-        //put("/actividades/:id/validar/:alumnoId", ActividadController.validarAsistencia);
-        //delete("/actividades/:id", ActividadController.eliminarActividad);
+        get("/actividades", ActividadController.getActividades);
+        
 
-        System.out.println("Running at http://localhost:8080");
+        // Student hours and history
+        get("/alumnos/:id/horas", AlumnoController.getHorasAlumno);
+        get("/alumnos/:id/historial", AlumnoController.getHistorialAlumno);
+        
+        // Activities and enrollment
+        get("/actividades/disponibles", AlumnoController.getActividadesDisponibles);
+        post("/inscripciones", AlumnoController.inscribirEnActividad);
+        
+        // Utilities
+        get("/departamentos", AlumnoController.getDepartamentos);      
+
+        System.out.println("Server running on http://localhost:8080");
     }
+
+    
 
     static class LoginRequest {
         String email;

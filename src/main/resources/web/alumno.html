@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel del Alumno</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Panel del Alumno</h1>
+            <div class="user-info">
+                <span id="alumnoNombre"></span>
+                <button onclick="cerrarSesion()">Cerrar Sesión</button>
+            </div>
+        </header>
+
+        <!-- Tabs -->
+        <nav class="tabs">
+            <button class="tab-button active" onclick="openTab('horasTab')">Mis Horas</button>
+            <button class="tab-button" onclick="openTab('actividadesTab')">Actividades Disponibles</button>
+            <button class="tab-button" onclick="openTab('historialTab')">Mi Historial</button>
+        </nav>
+
+        <!-- horas -->
+        <div id="horasTab" class="tab-content active">
+            <div class="hours-summary">
+                <div class="hour-card">
+                    <h3>Horas Pendientes</h3>
+                    <div class="hour-value" id="horasPendientes">0</div>
+                    <p>Horas por completar</p>
+                </div>
+                <div class="hour-card">
+                    <h3>Horas Acumuladas</h3>
+                    <div class="hour-value" id="horasAcumuladas">0</div>
+                    <p>Horas aprobadas</p>
+                </div>
+                <div class="hour-card">
+                    <h3>Total Horas</h3>
+                    <div class="hour-value" id="totalHoras">0</div>
+                    <p>Suma total</p>
+                </div>
+            </div>
+
+            <div class="progress-section">
+                <h3>Progreso de Horas</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">0% completado</div>
+            </div>
+        </div>
+
+        <!-- actividades -->
+        <div id="actividadesTab" class="tab-content">
+            <h2>Actividades Disponibles</h2>
+            <div class="filters">
+                <input type="text" id="searchActivity" placeholder="Buscar actividades..." onkeyup="filtrarActividades()">
+                <select id="filterDepartment" onchange="filtrarActividades()">
+                    <option value="">Todos los departamentos</option>
+                    <!-- js-->
+                </select>
+            </div>
+            <div id="listaActividades" class="activities-grid">
+                <!-- Actividades -->
+            </div>
+        </div>
+
+        <!-- Historial -->
+        <div id="historialTab" class="tab-content">
+            <h2>Mi Historial de Actividades</h2>
+            <div class="history-filters">
+                <select id="filterStatus" onchange="filtrarHistorial()">
+                    <option value="">Todos los estados</option>
+                    <option value="pending">Pendiente</option>
+                    <option value="completed">Completado</option>
+                    <option value="validated">Validado</option>
+                </select>
+            </div>
+            <table id="tablaHistorial" class="history-table">
+                <thead>
+                    <tr>
+                        <th>Actividad</th>
+                        <th>Fecha</th>
+                        <th>Horas</th>
+                        <th>Estado</th>
+                        <th>Fecha de Inscripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Historial -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="alumno.js"></script>
+</body>
+</html>

@@ -2,7 +2,11 @@ package com.uvg.horasbeca.controller;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gson.Gson;
@@ -40,6 +44,36 @@ public class ActividadController {
 
         res.status(201);
         return gson.toJson(Map.of("success", true));
+    };
+
+    public static Route getActividades = (req, res) -> {
+        res.type("application/json");
+        
+        try (Connection conn = DbConnection.getConnection()) {
+            String sql = "SELECT * FROM Actividades ORDER BY fechaActividad DESC";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+            
+            List<Map<String, Object>> actividades = new ArrayList<>();
+            while (rs.next()) {
+                Map<String, Object> actividad = new HashMap<>();
+                actividad.put("id", rs.getInt("id"));
+                actividad.put("titulo", rs.getString("titulo"));
+                actividad.put("descripcion", rs.getString("descripcion"));
+                actividad.put("horasOtorgadas", rs.getInt("horasOtorgadas"));
+                actividad.put("cupoMaximo", rs.getInt("cupoMaximo"));
+                actividad.put("cupoUsado", rs.getInt("cupoUsado"));
+                actividad.put("fechaActividad", rs.getString("fechaActividad"));
+                actividad.put("horaActividad", rs.getString("horaActividad"));
+                actividad.put("encargadoId", rs.getInt("encargadoId"));
+                actividades.add(actividad);
+            }
+            
+            return gson.toJson(actividades);
+        } catch (SQLException e) {
+            res.status(500);
+            return gson.toJson(Map.of("error", "Database error: " + e.getMessage()));
+        }
     };
 
 }

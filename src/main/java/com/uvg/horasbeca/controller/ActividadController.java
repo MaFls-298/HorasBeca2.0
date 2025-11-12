@@ -50,7 +50,7 @@ public class ActividadController {
         res.type("application/json");
         
         try (Connection conn = DbConnection.getConnection()) {
-            String sql = "SELECT * FROM Actividades ORDER BY fechaActividad DESC";
+            String sql = "SELECT * FROM Actividades";
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
             

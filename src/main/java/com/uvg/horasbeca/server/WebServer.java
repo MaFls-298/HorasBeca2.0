@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.google.gson.Gson;
 import com.uvg.horasbeca.controller.ActividadController;
@@ -22,6 +24,20 @@ public class WebServer {
         port(8080); 
 
         staticFiles.location("/web");
+
+        post("/actividades", ActividadController.crearActividad);
+        get("/actividades", ActividadController.getActividades);
+        
+        get("/alumnos/:id/horas", AlumnoController.getHorasAlumno);
+        get("/alumnos/:id/historial", AlumnoController.getHistorialAlumno);
+        
+        get("/actividades/disponibles", AlumnoController.getActividadesDisponibles);
+        post("/inscripciones", AlumnoController.inscribirEnActividad);
+
+        get("/departamentos", AlumnoController.getDepartamentos);      
+
+        System.out.println("Server running on http://localhost:8080");
+
         Gson gson = new Gson();
 
         before((req, res) -> {
@@ -42,7 +58,8 @@ public class WebServer {
             String tipoUsuario = "";
 
             try (Connection conn = DbConnection.getConnection()) {
-                String sql = "SELECT nombreUser, tipoUsuario FROM usuarios WHERE emailInstitucional=? AND passwordUser=?";
+                String sql = "SELECT carnetUser, nombreUser, tipoUsuario, emailInstitucional FROM usuarios WHERE emailInstitucional=? AND passwordUser=?";
+
                 PreparedStatement stmt = conn.prepareStatement(sql);
                 stmt.setString(1, body.email);
                 stmt.setString(2, body.password);
@@ -53,10 +70,22 @@ public class WebServer {
                 System.out.println("TipoUsuario: " + body.tipoUsuario);
 
                 ResultSet rs = stmt.executeQuery();
+
+                
                 if (rs.next()) {
                     success = true;
                     nombre = rs.getString("nombreUser");
                     tipoUsuario = rs.getString("tipoUsuario");
+                    
+                    Map<String, Object> result = new HashMap<>();
+                    result.put("success", true);
+                    result.put("id", rs.getInt("carnetUser"));   // <- crucial
+                    result.put("nombre", rs.getString("nombreUser"));
+                    result.put("tipoUsuario", rs.getString("tipoUsuario"));
+                    result.put("email", rs.getString("emailInstitucional"));
+                    return new Gson().toJson(result);
+
+                    
                                         
                 }
             } catch (SQLException e) {
@@ -66,22 +95,7 @@ public class WebServer {
             return gson.toJson(new LoginResponse(success, nombre, tipoUsuario));
         });
 
-        post("/actividades", ActividadController.crearActividad);
-        get("/actividades", ActividadController.getActividades);
-        
 
-        // Student hours and history
-        get("/alumnos/:id/horas", AlumnoController.getHorasAlumno);
-        get("/alumnos/:id/historial", AlumnoController.getHistorialAlumno);
-        
-        // Activities and enrollment
-        get("/actividades/disponibles", AlumnoController.getActividadesDisponibles);
-        post("/inscripciones", AlumnoController.inscribirEnActividad);
-        
-        // Utilities
-        get("/departamentos", AlumnoController.getDepartamentos);      
-
-        System.out.println("Server running on http://localhost:8080");
     }
 
     

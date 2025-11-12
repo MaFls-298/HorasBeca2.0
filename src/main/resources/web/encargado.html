@@ -7,10 +7,15 @@
 </head>
 
 <body>
-  <h1>Panel del Encargado</h1>
-  <div class="container">
     
-  <p>Bienvenido, <span id="encargadoNombre"></span></p>
+    <div class="container">
+        <header>
+            <h1>Panel del Encargado</h1>
+            <div class="user-info">
+                <span id="encargadoNombre"></span>
+                <button onclick="logout()">Cerrar Sesión</button>
+            </div>
+        </header>
 
 <!-- Tabs -->
   <div class="tabs">
@@ -98,10 +103,7 @@
     </div>
   </div>
 
-  <!-- logout -->
-  <div class="logout">
-      <button onclick="logout()">Cerrar sesión</button>
-    </div>
+
 
     <!-- /////////////////////////////////////// -->
   

@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     cargarDepartamentos();
 });
 
-// Tab s
+// Tabs
 function openTab(tabName) {
     // Hide
     const tabContents = document.getElementsByClassName("tab-content");
@@ -32,15 +32,34 @@ function openTab(tabName) {
         tabButtons[i].classList.remove("active");
     }
 
-    // cont tab especifics
+    // cont tab especificas
     document.getElementById(tabName).classList.add("active");
     event.currentTarget.classList.add("active");
 }
 
-// cargar horas
+// cargar horas ///////////////////////////////////////////////////
 async function cargarHorasAlumno() {
+    
+
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+
+    if (!usuario || !usuario.id) {
+    console.error("No se encontró el ID del alumno en localStorage:", usuario);
+    alert("Error: No se encontró información del alumno. Inicia sesión de nuevo.");
+    window.location.href = "index.html";
+    return;
+    }
+
+    const alumnoId = usuario.id;
+    console.log("Fetching hours for alumnoId:", alumnoId);
+
     try {
         const res = await fetch(`/alumnos/${alumnoId}/horas`);
+        if (!res.ok) {
+            const text = await res.text();
+            console.error("Error server:", text);
+            throw new Error(`HTTP ${res.status}`);
+        }
         const data = await res.json();
         
         if (data.success) {
@@ -55,11 +74,11 @@ async function cargarHorasAlumno() {
             document.getElementById('progressText').textContent = `${Math.round(porcentaje)}% completado`;
         }
     } catch (error) {
-        console.error('Error loading hours:', error);
+        console.error('Error cargando horas:', error);
     }
 }
 
-// disponibles
+// actividades disponibles //////////////////////////////////////////////
 async function cargarActividadesDisponibles() {
     try {
         const res = await fetch('/actividades/disponibles');
@@ -74,7 +93,7 @@ async function cargarActividadesDisponibles() {
     }
 }
 
-// Display 
+// Display /////////////////////////////////////////////////////
 function mostrarActividadesDisponibles(actividades) {
     const container = document.getElementById('listaActividades');
     
@@ -105,7 +124,7 @@ function mostrarActividadesDisponibles(actividades) {
     `).join('');
 }
 
-// Filter
+// filtrar ////////////////////////////////////////////////
 function filtrarActividades() {
     const searchTerm = document.getElementById('searchActivity').value.toLowerCase();
     const departmentFilter = document.getElementById('filterDepartment').value;
@@ -121,7 +140,7 @@ function filtrarActividades() {
     mostrarActividadesDisponibles(filtered);
 }
 
-// departamento
+// departamento /////////////////////////////////////////////////
 async function cargarDepartamentos() {
     try {
         const res = await fetch('/departamentos');
@@ -137,7 +156,7 @@ async function cargarDepartamentos() {
     }
 }
 
-// inscribir
+// inscribir //////////////////////////////////////////////////////
 async function inscribirEnActividad(actividadId) {
     if (!confirm('¿Estás seguro de que quieres inscribirte en esta actividad?')) {
         return;
@@ -220,7 +239,7 @@ function filtrarHistorial() {
 }
 
 // Logout
-function cerrarSesion() {
+function logout() {
     localStorage.removeItem('usuario');
     window.location.href = "/index.html";
 }

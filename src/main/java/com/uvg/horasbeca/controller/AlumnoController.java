@@ -17,41 +17,51 @@ import spark.Route;
 public class AlumnoController {
     private static final Gson gson = new Gson();
 
-    // Get horas
-    public static Route getHorasAlumno = (req, res) -> {
-        res.type("application/json");
-        int alumnoId = Integer.parseInt(req.params("id"));
-        
-        try (Connection conn = DbConnection.getConnection()) {
-            String sql = "SELECT horasBecaPendiente, horasAcumuladas FROM Usuarios WHERE id = ?";
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, alumnoId);
-            ResultSet rs = stmt.executeQuery();
-            
-            if (rs.next()) {
-                Map<String, Object> response = new HashMap<>();
-                response.put("success", true);
-                response.put("horasPendientes", rs.getInt("horasBecaPendiente"));
-                response.put("horasAcumuladas", rs.getInt("horasAcumuladas"));
-                return gson.toJson(response);
-            }
-            
-            res.status(404);
-            return gson.toJson(Map.of("success", false, "error", "Alumno no encontrado"));
-        } catch (SQLException e) {
-            res.status(500);
-            return gson.toJson(Map.of("success", false, "error", e.getMessage()));
-        }
-    };
+    //get horas del alumno///////////////////
 
-    // Get actividades
+    public static Route getHorasAlumno = (req, res) -> {
+    res.type("application/json");
+    String alumnoId = req.params("id");
+
+    try (Connection conn = DbConnection.getConnection()) {
+        String sql = "SELECT horasBecaPendiente, horasAcumuladas FROM usuarios WHERE carnetUser = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, Integer.parseInt(alumnoId));
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Map<String, Object> result = new HashMap<>();
+                    result.put("success", true);
+                    result.put("horasPendientes", rs.getInt("horasBecaPendiente"));
+                    result.put("horasAcumuladas", rs.getInt("horasAcumuladas"));
+                    return new Gson().toJson(result);
+                } else {
+                    res.status(404);
+                    return new Gson().toJson(Map.of("success", false, "error", "Alumno no encontrado"));
+                }
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        res.status(500);
+        return new Gson().toJson(Map.of("success", false, "error", e.getMessage()));
+    } catch (Exception e) {
+        e.printStackTrace();
+        res.status(500);
+        return new Gson().toJson(Map.of("success", false, "error", "Error inesperado: " + e.getMessage()));
+    }
+};
+
+    // actividades disponibesl ///////////////////////
     public static Route getActividadesDisponibles = (req, res) -> {
         res.type("application/json");
         
+        System.out.println("Getting available activities");
+        
         try (Connection conn = DbConnection.getConnection()) {
+            
             String sql = "SELECT a.*, u.departamento FROM Actividades a " +
-                        "JOIN Usuarios u ON a.encargado_id = u.id " +
-                        "WHERE a.actividadState = true AND a.cupoUsado < a.cupoMaximo " +
+                        "JOIN Usuarios u ON a.encargado_id = u.carnetUser " + // CHANGED: encargado_id references carnetUser
+                        "WHERE a.actividadState = 1 AND a.cupoUsado < a.cupoMaximo " +
                         "ORDER BY a.fechaActividad, a.horaActividad";
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
@@ -73,25 +83,29 @@ public class AlumnoController {
             
             return gson.toJson(Map.of("success", true, "actividades", actividades));
         } catch (SQLException e) {
+            System.err.println("Error getting available activities: " + e.getMessage());
             res.status(500);
             return gson.toJson(Map.of("success", false, "error", e.getMessage()));
         }
     };
 
-    // Get historial
+    // Get historial del alumno ///////////////////////////////
     public static Route getHistorialAlumno = (req, res) -> {
         res.type("application/json");
-        int alumnoId = Integer.parseInt(req.params("id"));
+        String alumnoId = req.params("id");
+        
+        System.out.println("Getting history for student: " + alumnoId);
         
         try (Connection conn = DbConnection.getConnection()) {
+            
             String sql = "SELECT i.*, a.titulo as tituloActividad, a.fechaActividad, a.horaActividad, a.horasOtorgadas, " +
-                        "CASE WHEN a.fechaActividad < CURDATE() THEN true ELSE false END as actividadCompletada " +
-                        "FROM InscripcionesAlumnos i " +
+                        "CASE WHEN a.fechaActividad < date('now') THEN 1 ELSE 0 END as actividadCompletada " +
+                        "FROM inscripciones i " +
                         "JOIN Actividades a ON i.actividadId = a.id " +
-                        "WHERE i.alumnoId = ? " +
+                        "WHERE i.alumnoId = ? " + 
                         "ORDER BY a.fechaActividad DESC, i.fechaInscripcion DESC";
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, alumnoId);
+            stmt.setString(1, alumnoId);
             ResultSet rs = stmt.executeQuery();
             
             List<Map<String, Object>> inscripciones = new ArrayList<>();
@@ -110,26 +124,29 @@ public class AlumnoController {
             
             return gson.toJson(Map.of("success", true, "inscripciones", inscripciones));
         } catch (SQLException e) {
+            System.err.println("Error getting student history: " + e.getMessage());
             res.status(500);
             return gson.toJson(Map.of("success", false, "error", e.getMessage()));
         }
     };
 
-    // inscribir
+    // inscribirse en actiividad ///////////////////////////////////////////
     public static Route inscribirEnActividad = (req, res) -> {
         res.type("application/json");
         Map<String, Object> body = gson.fromJson(req.body(), Map.class);
         int actividadId = ((Double) body.get("actividadId")).intValue();
-        int alumnoId = ((Double) body.get("alumnoId")).intValue();
+        String alumnoId = body.get("alumnoId").toString(); 
+        
+        System.out.println("Enrolling student " + alumnoId + " in activity " + actividadId);
         
         try (Connection conn = DbConnection.getConnection()) {
             conn.setAutoCommit(false);
             
             // Check if inscrito
-            String checkSql = "SELECT id FROM InscripcionesAlumnos WHERE actividadId = ? AND alumnoId = ?";
+            String checkSql = "SELECT id FROM inscripciones WHERE actividadId = ? AND alumnoId = ?";
             PreparedStatement checkStmt = conn.prepareStatement(checkSql);
             checkStmt.setInt(1, actividadId);
-            checkStmt.setInt(2, alumnoId);
+            checkStmt.setString(2, alumnoId); 
             ResultSet rs = checkStmt.executeQuery();
             
             if (rs.next()) {
@@ -137,7 +154,7 @@ public class AlumnoController {
                 return gson.toJson(Map.of("success", false, "error", "Ya estás inscrito en esta actividad"));
             }
             
-            // Check disponible
+            // check if cupo
             String activitySql = "SELECT cupoUsado, cupoMaximo FROM Actividades WHERE id = ?";
             PreparedStatement activityStmt = conn.prepareStatement(activitySql);
             activityStmt.setInt(1, actividadId);
@@ -152,14 +169,14 @@ public class AlumnoController {
                     return gson.toJson(Map.of("success", false, "error", "El cupo para esta actividad está lleno"));
                 }
                 
-                // inscribir db
-                String enrollSql = "INSERT INTO InscripcionesAlumnos (actividadId, alumnoId, fechaInscripcion) VALUES (?, ?, CURDATE())";
+                // inscribir
+                String enrollSql = "INSERT INTO inscripciones (actividadId, alumnoId, fechaInscripcion) VALUES (?, ?, date('now'))";
                 PreparedStatement enrollStmt = conn.prepareStatement(enrollSql);
                 enrollStmt.setInt(1, actividadId);
-                enrollStmt.setInt(2, alumnoId);
+                enrollStmt.setString(2, alumnoId); 
                 enrollStmt.executeUpdate();
                 
-                
+                // Update cuenta 
                 String updateSql = "UPDATE Actividades SET cupoUsado = cupoUsado + 1 WHERE id = ?";
                 PreparedStatement updateStmt = conn.prepareStatement(updateSql);
                 updateStmt.setInt(1, actividadId);
@@ -173,14 +190,17 @@ public class AlumnoController {
             return gson.toJson(Map.of("success", false, "error", "Actividad no encontrada"));
             
         } catch (SQLException e) {
+            System.err.println("Error enrolling student: " + e.getMessage());
             res.status(500);
             return gson.toJson(Map.of("success", false, "error", e.getMessage()));
         }
     };
 
-    // Get departaments
+    // Get departmentos
     public static Route getDepartamentos = (req, res) -> {
         res.type("application/json");
+        
+        System.out.println("Getting departments");
         
         try (Connection conn = DbConnection.getConnection()) {
             String sql = "SELECT DISTINCT departamento FROM Usuarios WHERE departamento IS NOT NULL";
@@ -194,6 +214,7 @@ public class AlumnoController {
             
             return gson.toJson(Map.of("success", true, "departamentos", departamentos));
         } catch (SQLException e) {
+            System.err.println("Error getting departments: " + e.getMessage());
             res.status(500);
             return gson.toJson(Map.of("success", false, "error", e.getMessage()));
         }

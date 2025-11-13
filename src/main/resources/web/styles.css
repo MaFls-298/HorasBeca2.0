@@ -142,12 +142,12 @@ footer {
 
 .tab-button.active {
     border-bottom-color: #0c7e2e;
-    color: #06c726;
+    color: #057c19ad;
     font-weight: bold;
 }
 
 .tab-button:hover:not(.active) {
-    background-color: #f8f9fa;
+    background-color: #0a530d83;
 }
 
 .tab-content {
@@ -214,7 +214,7 @@ footer {
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #00a126, #e9fcf6);
+    background: linear-gradient(90deg, #00a126, #108301);
     transition: width 0.5s ease;
 }
 

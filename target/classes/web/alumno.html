@@ -55,6 +55,22 @@
         <!-- actividades -->
         <div id="actividadesTab" class="tab-content">
             <h2>Actividades Disponibles</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                    <th>Título</th>
+                    <th>Descripción</th>
+                    <th>Horas</th>
+                    <th>Cupo</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaActividades"></tbody>
+                </table>
+
             <div class="filters">
                 <input type="text" id="searchActivity" placeholder="Buscar actividades..." onkeyup="filtrarActividades()">
                 <select id="filterDepartment" onchange="filtrarActividades()">

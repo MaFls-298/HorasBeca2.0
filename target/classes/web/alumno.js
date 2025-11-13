@@ -13,12 +13,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // datos iniciales
     cargarHorasAlumno();
-    cargarActividadesDisponibles();
+    loadActividadesDisponibles();
     cargarHistorialAlumno();
     cargarDepartamentos();
 });
 
-// Tabs
+// Tabs//////////////////////////////////////////////////////////////
+
 function openTab(tabName) {
     // Hide
     const tabContents = document.getElementsByClassName("tab-content");
@@ -38,14 +39,15 @@ function openTab(tabName) {
 }
 
 // cargar horas ///////////////////////////////////////////////////
+
 async function cargarHorasAlumno() {
     
 
     const usuario = JSON.parse(localStorage.getItem('usuario'));
 
     if (!usuario || !usuario.id) {
-    console.error("No se encontró el ID del alumno en localStorage:", usuario);
-    alert("Error: No se encontró información del alumno. Inicia sesión de nuevo.");
+    console.error("No se encontro el ID del alumno en localStorage:", usuario);
+    alert("Error: No se encontró informacion del alumno.");
     window.location.href = "index.html";
     return;
     }
@@ -79,65 +81,73 @@ async function cargarHorasAlumno() {
 }
 
 // actividades disponibles //////////////////////////////////////////////
-async function cargarActividadesDisponibles() {
+
+async function loadActividadesDisponibles() {
     try {
         const res = await fetch('/actividades/disponibles');
         const data = await res.json();
-        
-        if (data.success) {
-            actividadesDisponibles = data.actividades;
-            mostrarActividadesDisponibles(actividadesDisponibles);
+        console.log("Data from server:", data);
+
+        if (!data.success) {
+            console.error('Error:', data.error);
+            return;
         }
+
+        actividadesDisponibles = data.actividades;
+        showActividades(actividadesDisponibles);
+        cargarDepartamentos();
+
+
     } catch (error) {
-        console.error('Error loading activities:', error);
+        console.error('Error cargando actividades:', error);
     }
 }
 
-// Display /////////////////////////////////////////////////////
-function mostrarActividadesDisponibles(actividades) {
-    const container = document.getElementById('listaActividades');
-    
-    if (actividades.length === 0) {
-        container.innerHTML = '<p class="no-data">No hay actividades disponibles en este momento.</p>';
-        return;
-    }
+//tabla mostrar
+function showActividades(actividades){
+    console.log("Ejemplo de actividad:", actividades[0]);
+        const tabla = document.getElementById('tablaActividades');
+        tabla.innerHTML = ''; // clear 
 
-    container.innerHTML = actividades.map(actividad => `
-        <div class="activity-card" data-department="${actividad.departamento}">
-            <h3>${actividad.titulo}</h3>
-            <p class="activity-description">${actividad.descripcion}</p>
-            <div class="activity-details">
-                <span class="detail"><strong>Horas:</strong> ${actividad.horasOtorgadas}</span>
-                <span class="detail"><strong>Cupo:</strong> ${actividad.cupoUsado}/${actividad.cupoMaximo}</span>
-                <span class="detail"><strong>Fecha:</strong> ${new Date(actividad.fechaActividad).toLocaleDateString()}</span>
-                <span class="detail"><strong>Hora:</strong> ${actividad.horaActividad}</span>
-                <span class="detail"><strong>Departamento:</strong> ${actividad.departamento}</span>
-            </div>
-            <button 
-                class="enroll-btn ${actividad.cupoUsado >= actividad.cupoMaximo ? 'full' : ''}" 
-                onclick="inscribirEnActividad(${actividad.id})"
-                ${actividad.cupoUsado >= actividad.cupoMaximo ? 'disabled' : ''}
-            >
-                ${actividad.cupoUsado >= actividad.cupoMaximo ? 'Cupo Lleno' : 'Inscribirse'}
-            </button>
-        </div>
-    `).join('');
+        actividades.forEach(act => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${act.titulo}</td>
+            <td>${act.descripcion}</td>
+            <td>${act.horasOtorgadas}</td>
+            <td>${act.cupoUsado}/${act.cupoMaximo}</td>
+            <td>${act.fechaActividad}</td>
+            <td>${act.horaActividad || ''}</td>
+            <td><button onclick="inscribirse(${act.id})">Inscribirse</button></td>`;
+            tabla.appendChild(row);
+        });
 }
 
-// filtrar ////////////////////////////////////////////////
+// filtrar 
 function filtrarActividades() {
     const searchTerm = document.getElementById('searchActivity').value.toLowerCase();
     const departmentFilter = document.getElementById('filterDepartment').value;
+
+    console.log("Filtering-Search:", searchTerm, "Departamento:", departmentFilter);
+    console.log("All actividades:", actividadesDisponibles);
     
     const filtered = actividadesDisponibles.filter(actividad => {
+        console.log("Actividad departamento:", actividad.departamento, "Filter:", departmentFilter);
         const matchesSearch = actividad.titulo.toLowerCase().includes(searchTerm) || 
                             actividad.descripcion.toLowerCase().includes(searchTerm);
-        const matchesDepartment = !departmentFilter || actividad.departamento === departmentFilter;
+        
+        const actividadDept = actividad.departamento ? actividad.departamento.toString().trim().toLowerCase() : "";
+        const filterDept = departmentFilter ? departmentFilter.trim().toLowerCase() : "";
+        
+        const matchesDepartment = !departmentFilter || actividadDept === filterDept;
+        
+        console.log("Matches search:", matchesSearch, "Matches department:", matchesDepartment);
         
         return matchesSearch && matchesDepartment;
     });
     
-    mostrarActividadesDisponibles(filtered);
+    console.log("Filtered results:", filtered);
+    showActividades(filtered);
 }
 
 // departamento /////////////////////////////////////////////////
@@ -155,6 +165,8 @@ async function cargarDepartamentos() {
         console.error('Error loading departments:', error);
     }
 }
+
+
 
 // inscribir //////////////////////////////////////////////////////
 async function inscribirEnActividad(actividadId) {

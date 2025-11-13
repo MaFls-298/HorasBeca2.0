@@ -26,12 +26,11 @@ public class WebServer {
         staticFiles.location("/web");
 
         post("/actividades", ActividadController.crearActividad);
-        get("/actividades", ActividadController.getActividades);
         
         get("/alumnos/:id/horas", AlumnoController.getHorasAlumno);
         get("/alumnos/:id/historial", AlumnoController.getHistorialAlumno);
         
-        get("/actividades/disponibles", AlumnoController.getActividadesDisponibles);
+        get("/actividades/disponibles", ActividadController.getActividadesDisponibles);
         post("/inscripciones", AlumnoController.inscribirEnActividad);
 
         get("/departamentos", AlumnoController.getDepartamentos);      
@@ -79,14 +78,12 @@ public class WebServer {
                     
                     Map<String, Object> result = new HashMap<>();
                     result.put("success", true);
-                    result.put("id", rs.getInt("carnetUser"));   // <- crucial
+                    result.put("id", rs.getInt("carnetUser"));  
                     result.put("nombre", rs.getString("nombreUser"));
                     result.put("tipoUsuario", rs.getString("tipoUsuario"));
                     result.put("email", rs.getString("emailInstitucional"));
                     return new Gson().toJson(result);
 
-                    
-                                        
                 }
             } catch (SQLException e) {
                 System.out.println("Error en sqlite: " + e.getMessage());

@@ -46,35 +46,85 @@ public class ActividadController {
         return gson.toJson(Map.of("success", true));
     };
 
-    public static Route getActividades = (req, res) -> {
+    // actividades disponibesl ///////////////////////
+    public static Route getActividadesDisponibles = (req, res) -> {
         res.type("application/json");
-        
-        try (Connection conn = DbConnection.getConnection()) {
-            String sql = "SELECT * FROM Actividades";
+                
+            try (Connection conn = DbConnection.getConnection()) {
+        String sql = """
+            SELECT a.id,
+                    a.titulo,
+                    a.descripcion,
+                    a.horasOtorgadas,
+                    a.cupoUsado,
+                    a.cupoMaximo,
+                    a.fechaActividad,
+                    a.horaActividad,
+                    a.encargado_id,
+                    u.departamento
+                    
+            FROM actividades a
+            LEFT JOIN usuarios u ON a.encargado_id = u.carnetUser
+            WHERE a.actividadState = 1""";
+
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
             
             List<Map<String, Object>> actividades = new ArrayList<>();
-            while (rs.next()) {
-                Map<String, Object> actividad = new HashMap<>();
-                actividad.put("id", rs.getInt("id"));
-                actividad.put("titulo", rs.getString("titulo"));
-                actividad.put("descripcion", rs.getString("descripcion"));
-                actividad.put("horasOtorgadas", rs.getInt("horasOtorgadas"));
-                actividad.put("cupoMaximo", rs.getInt("cupoMaximo"));
-                actividad.put("cupoUsado", rs.getInt("cupoUsado"));
-                actividad.put("fechaActividad", rs.getString("fechaActividad"));
-                actividad.put("horaActividad", rs.getString("horaActividad"));
-                actividad.put("encargadoId", rs.getInt("encargadoId"));
-                actividades.add(actividad);
-            }
+                    System.out.println("=== RAW DATABASE RESULTS ===");
+        while (rs.next()) {
+            Map<String, Object> act = new HashMap<>();
+            act.put("id", rs.getInt("id"));
+            act.put("titulo", rs.getString("titulo"));
             
-            return gson.toJson(actividades);
+            String departamento = rs.getString("departamento");
+            
+            int encargado_id = rs.getInt("encargado_id");
+            
+            // Debug print for each row
+            System.out.println("Activity: " + rs.getString("titulo") + 
+                            " | Encargado ID: " + encargado_id +
+                            
+                            " | Departamento: " + departamento);
+            
+            act.put("descripcion", rs.getString("descripcion"));
+            act.put("horasOtorgadas", rs.getInt("horasOtorgadas"));
+            act.put("cupoMaximo", rs.getInt("cupoMaximo"));
+            act.put("cupoUsado", rs.getInt("cupoUsado"));
+            act.put("fechaActividad", rs.getString("fechaActividad"));
+            act.put("horaActividad", rs.getString("horaActividad"));
+            act.put("departamento", departamento);
+            act.put("encargado_id", encargado_id);
+            actividades.add(act);
+        }
+        System.out.println("=== END DATABASE RESULTS ===");
+            while (rs.next()) {
+                Map<String, Object> act = new HashMap<>();
+                act.put("id", rs.getInt("id"));
+                act.put("titulo", rs.getString("titulo"));
+                act.put("descripcion", rs.getString("descripcion"));
+                act.put("horasOtorgadas", rs.getInt("horasOtorgadas"));
+                act.put("cupoMaximo", rs.getInt("cupoMaximo"));
+                act.put("cupoUsado", rs.getInt("cupoUsado"));
+                act.put("fechaActividad", rs.getString("fechaActividad"));
+                act.put("horaActividad", rs.getString("horaActividad"));
+                act.put("departamento", rs.getString("departamento"));
+                act.put("encargado_id", rs.getInt("encargado_id"));
+                actividades.add(act);
+            }
+            System.out.println("Actividades fetched: " + actividades);
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("actividades", actividades);
+            return gson.toJson(response);
+
         } catch (SQLException e) {
+            e.printStackTrace();
             res.status(500);
-            return gson.toJson(Map.of("error", "Database error: " + e.getMessage()));
+            return gson.toJson(Map.of("success", false, "error", e.getMessage()));
         }
     };
+
 
 }
 

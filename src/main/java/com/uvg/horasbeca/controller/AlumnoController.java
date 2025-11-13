@@ -51,43 +51,6 @@ public class AlumnoController {
     }
 };
 
-    // actividades disponibesl ///////////////////////
-    public static Route getActividadesDisponibles = (req, res) -> {
-        res.type("application/json");
-        
-        System.out.println("Getting available activities");
-        
-        try (Connection conn = DbConnection.getConnection()) {
-            
-            String sql = "SELECT a.*, u.departamento FROM Actividades a " +
-                        "JOIN Usuarios u ON a.encargado_id = u.carnetUser " + // CHANGED: encargado_id references carnetUser
-                        "WHERE a.actividadState = 1 AND a.cupoUsado < a.cupoMaximo " +
-                        "ORDER BY a.fechaActividad, a.horaActividad";
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery();
-            
-            List<Map<String, Object>> actividades = new ArrayList<>();
-            while (rs.next()) {
-                Map<String, Object> actividad = new HashMap<>();
-                actividad.put("id", rs.getInt("id"));
-                actividad.put("titulo", rs.getString("titulo"));
-                actividad.put("descripcion", rs.getString("descripcion"));
-                actividad.put("horasOtorgadas", rs.getInt("horasOtorgadas"));
-                actividad.put("cupoMaximo", rs.getInt("cupoMaximo"));
-                actividad.put("cupoUsado", rs.getInt("cupoUsado"));
-                actividad.put("fechaActividad", rs.getString("fechaActividad"));
-                actividad.put("horaActividad", rs.getString("horaActividad"));
-                actividad.put("departamento", rs.getString("departamento"));
-                actividades.add(actividad);
-            }
-            
-            return gson.toJson(Map.of("success", true, "actividades", actividades));
-        } catch (SQLException e) {
-            System.err.println("Error getting available activities: " + e.getMessage());
-            res.status(500);
-            return gson.toJson(Map.of("success", false, "error", e.getMessage()));
-        }
-    };
 
     // Get historial del alumno ///////////////////////////////
     public static Route getHistorialAlumno = (req, res) -> {

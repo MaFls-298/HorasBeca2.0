@@ -168,36 +168,38 @@ async function cargarDepartamentos() {
 
 
 
-// inscribir //////////////////////////////////////////////////////
-async function inscribirEnActividad(actividadId) {
-    if (!confirm('¿Estás seguro de que quieres inscribirte en esta actividad?')) {
-        return;
-    }
+// inscribirse //////////////////////////////////////////////////////
+async function inscribirse(actividadId) {
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    const alumnoId = usuario.id;
+
+    // ✅ Confirmation message
+    const confirmar = window.confirm("¿Estás seguro que quieres inscribirte en esta actividad?");
+    if (!confirmar) return; // User canceled
 
     try {
-        const res = await fetch('/inscripciones', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                actividadId: actividadId,
-                alumnoId: alumnoId
-            })
+        const res = await fetch("http://localhost:8080/actividades/inscribirse", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ alumnoId, actividadId })
         });
 
         const data = await res.json();
-        
+
         if (data.success) {
-            alert('✅ Te has inscrito correctamente en la actividad');
-            cargarActividadesDisponibles(); // Refresh 
-            cargarHistorialAlumno(); // Refresh 
+            alert(data.msg);
+            // Refresh the table to show updated cupoUsado
+            loadActividadesDisponibles();
         } else {
-            alert('❌ Error: ' + data.error);
+            alert("No se pudo inscribir: " + data.msg);
         }
+
     } catch (error) {
-        console.error('Error enrolling:', error);
-        alert('❌ Error de conexión');
+        console.error("Error inscribiéndose:", error);
+        alert("Error al inscribirse. Intenta nuevamente.");
     }
 }
+
 
 
 async function cargarHistorialAlumno() {

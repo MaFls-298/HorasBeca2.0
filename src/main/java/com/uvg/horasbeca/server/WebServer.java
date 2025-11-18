@@ -30,17 +30,22 @@ public class WebServer {
         post("/actividades", ActividadController.crearActividad);
         get("/actividades/disponibles", ActividadController.getActividadesDisponibles);
         get("/actividades/encargado/:id", ActividadController.getActividadesByEncargado);
+        post("/actividades/toggleDisponibilidad", ActividadController.toggleDisponibilidadActividad);
+
 
 
         //alumnos
         get("/alumnos/:id/horas", AlumnoController.getHorasAlumno);
+        get("/actividades/inscritos/:id", AlumnoController.getInscritosByActividad);
+        post("/actividades/inscribirse", AlumnoController.inscribirseActividad);
+
         //get("/alumnos/:id/historial", AlumnoController.getHistorialAlumno);
         
-        //inscripciones
-        post("/inscripciones", AlumnoController.inscribirEnActividad);
 
         //encargados
-        get("/departamentos", EncargadoController.getDepartamentos);      
+        get("/departamentos", EncargadoController.getDepartamentos);  
+        post("/inscripcion/validarHoras", EncargadoController.validarHorasAlumno);
+    
 
         System.out.println("Server running on http://localhost:8080");
 

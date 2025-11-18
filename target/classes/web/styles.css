@@ -429,3 +429,25 @@ header {
         .btn-editar { background: #009700; color: rgb(255, 255, 255); }
         .btn-toggle { background: #009700; color: white; }
         .btn-eliminar { background: #d32f2f; color: white; }
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background: #fff;
+    padding: 20px;
+    width: 60%;
+    margin: 80px auto;
+    border-radius: 10px;
+}
+
+.close {
+    float: right;
+    font-size: 22px;
+    cursor: pointer;
+}
+

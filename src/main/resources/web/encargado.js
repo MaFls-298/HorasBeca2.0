@@ -121,6 +121,7 @@ function showCardsActividades(actividades) {
     }
 
     actividades.forEach(act => {
+      console.log("Actividad:", act)
         const card = document.createElement("div");
         card.classList.add("card");
 
@@ -131,16 +132,109 @@ function showCardsActividades(actividades) {
             <p><strong>Hora:</strong> ${act.horaActividad}</p>
             <p><strong>Cupo:</strong> ${act.cupoUsado}/${act.cupoMaximo}</p>
             <div class="buttons">
-                <button class="btn-detalles">Ver detalles</button>
+                <button onclick="verDetallesActividad(${act.id})">Ver detalles</button>
                 <button class="btn-editar">Editar</button>
-                <button class="btn-toggle">Disponible/No disponible</button>
+                <button class="btn-toggle" onclick="cambiarDisponibilidad(${act.id})"> ${act.actividadState ? 'Marcar como no disponible' : 'Marcar como disponible'} </button>
                 <button class="btn-eliminar">Eliminar</button>
             </div>
         `;
 
         container.appendChild(card);
+        console.log("Button HTML:", `
+    <button onclick="verDetallesActividad(${act.id})">Ver detalles</button>
+`);
     });
 }
+
+async function verDetallesActividad(id) {
+  
+    try {
+        const res = await fetch(`http://localhost:8080/actividades/inscritos/${id}`);
+        const data = await res.json();
+
+        console.log("Inscritos:", data);
+
+        const lista = data.inscritos.map(a =>
+          `<li>
+              <strong>${a.nombre}</strong> (${a.carnet}) - ${a.email}
+              <button onclick="validarHoras(${a.carnet}, ${id}, ${a.inscripcionId})">
+                  Validar Horas
+              </button>
+          </li>`
+        ).join("");
+
+        const modalContent = document.getElementById("modalContenido");
+        modalContent.innerHTML = `
+            <h2>Detalles de Actividad</h2>
+            <p><strong>ID:</strong> ${id}</p>
+
+            <h3>Alumnos inscritos</h3>
+            <ul>
+                ${lista.length > 0 ? lista : "<em>No hay alumnos inscritos</em>"}
+            </ul>
+        `;
+
+        document.getElementById("modalDetalles").style.display = "block";
+
+    } catch (error) {
+        console.error("Error cargando inscritos:", error);
+    }
+}
+
+function cerrarModal() {
+    document.getElementById("modalDetalles").style.display = "none";
+}
+
+async function validarHoras(alumnoId, actividadId, inscripcionId) {
+    try {
+        const res = await fetch("http://localhost:8080/inscripcion/validarHoras", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ inscripcionId, actividadId })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            alert("Horas validadas correctamente");
+            
+            verDetallesActividad(actividadId); //refresh
+        } else {
+            alert("Error al validar horas: " + data.msg);
+        }
+
+    } catch (error) {
+        console.error("Error validando horas:", error);
+    }
+}
+
+
+//cambiar disponible ////////////////////////////////////////////////////////////////
+async function cambiarDisponibilidad(actividadId) {
+    try {
+        const res = await fetch("http://localhost:8080/actividades/toggleDisponibilidad", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ actividadId })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            alert(data.msg);
+            // Refresh
+            loadActividadesPublicadas();
+        } else {
+            alert("No se pudo cambiar disponibilidad: " + data.msg);
+        }
+
+    } catch (error) {
+        console.error("Error cambiando disponibilidad:", error);
+        alert("Error al cambiar disponibilidad.");
+    }
+}
+
+
+
 
 
 

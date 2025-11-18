@@ -46,7 +46,9 @@ public class ActividadController {
         return gson.toJson(Map.of("success", true));
     };
 
-    // actividades disponibesl ///////////////////////
+
+    // actividades disponibesl /////////////////////////////////////////////////////
+
     public static Route getActividadesDisponibles = (req, res) -> {
         res.type("application/json");
                 
@@ -104,7 +106,7 @@ public class ActividadController {
         res.type("application/json");
         String encargadoId = req.params("id");
 
-    System.out.println("Requested encargado ID: " + req.params(":id"));
+        System.out.println("Requested encargado ID: " + req.params(":id"));
                 
             try (Connection conn = DbConnection.getConnection()) {
         String sql = """
@@ -145,22 +147,74 @@ public class ActividadController {
             }
             System.out.println("Fetched " + count + " actividades");
 
-        System.out.println("Actividades fetched for encargado " + encargadoId + ": " + actividades.size());
-        
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("actividades", actividades);
-        return gson.toJson(response);
+            System.out.println("Actividades fetched for encargado " + encargadoId + ": " + actividades.size());
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("actividades", actividades);
+            return gson.toJson(response);
 
 
-        } catch (SQLException e) {
-        e.printStackTrace();
-        res.status(500);
-        return gson.toJson(Map.of("success", false, "error", "SQL Error: " + e.getMessage()));
+            } catch (SQLException e) {
+            e.printStackTrace();
+            res.status(500);
+            return gson.toJson(Map.of("success", false, "error", "SQL Error: " + e.getMessage()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            res.status(500);
+            return gson.toJson(Map.of("success", false, "error", "Server Error: " + e.getMessage()));
+        }
+    };
+
+    //cambiar disponibilidad /////////////////////////////////////////////////////////////////////////////
+
+    public static Route toggleDisponibilidadActividad = (req, res) -> {
+    res.type("application/json");
+
+    try {
+        Map<String, Object> body = new Gson().fromJson(req.body(), Map.class);
+        if (body == null || !body.containsKey("actividadId")) {
+            return new Gson().toJson(Map.of("success", false, "msg", "Faltan datos requeridos"));
+        }
+
+        int actividadId = ((Number) body.get("actividadId")).intValue();
+
+        try (Connection conn = DbConnection.getConnection()) {
+            // Get cupoUsado, cupoMaximo, actividadState
+            PreparedStatement stmt = conn.prepareStatement(
+                "SELECT cupoUsado, cupoMaximo, actividadState FROM Actividades WHERE id = ?"
+            );
+            stmt.setInt(1, actividadId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (!rs.next()) {
+                return new Gson().toJson(Map.of("success", false, "msg", "Actividad no encontrada"));
+            }
+
+            int cupoUsado = rs.getInt("cupoUsado");
+            int cupoMaximo = rs.getInt("cupoMaximo");
+            boolean actividadState = rs.getBoolean("actividadState");
+
+            boolean newState = cupoUsado >= cupoMaximo ? false : !actividadState;
+
+            // Update
+            PreparedStatement update = conn.prepareStatement(
+                "UPDATE actividades SET actividadState = ? WHERE id = ?"
+            );
+            update.setBoolean(1, newState);
+            update.setInt(2, actividadId);
+            update.executeUpdate();
+
+            return new Gson().toJson(Map.of(
+                "success", true,
+                "newState", newState,
+                "msg", newState ? "Actividad disponible" : "Actividad no disponible"
+            ));
+        }
+
     } catch (Exception e) {
         e.printStackTrace();
-        res.status(500);
-        return gson.toJson(Map.of("success", false, "error", "Server Error: " + e.getMessage()));
+        return new Gson().toJson(Map.of("success", false, "msg", "Error interno del servidor"));
     }
 };
 

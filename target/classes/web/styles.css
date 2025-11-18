@@ -124,6 +124,10 @@ footer {
   font-size: 13px;
 }
 
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+
 .tabs {
     display: flex;
     margin-bottom: 20px;
@@ -142,12 +146,12 @@ footer {
 
 .tab-button.active {
     border-bottom-color: #0c7e2e;
-    color: #057c19ad;
+    color: #057c19;
     font-weight: bold;
 }
 
 .tab-button:hover:not(.active) {
-    background-color: #0a530d83;
+    background-color: #016a0483;
 }
 
 .tab-content {
@@ -382,3 +386,46 @@ header {
 .user-info button:hover {
     background-color: #c82333;
 }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: #fff;
+            padding: 18px;
+            border-radius: 10px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            margin: 0 0 10px;
+            color: #333;
+        }
+
+        .card p {
+            margin: 4px 0;
+            color: #555;
+        }
+
+        .buttons {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        button {
+            padding: 7px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-detalles { background: #009700; color: white; }
+        .btn-editar { background: #009700; color: rgb(255, 255, 255); }
+        .btn-toggle { background: #009700; color: white; }
+        .btn-eliminar { background: #d32f2f; color: white; }

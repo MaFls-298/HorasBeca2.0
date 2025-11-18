@@ -10,10 +10,10 @@ public class DbConnection {
     public static Connection getConnection() {
         try {
             Connection conn = DriverManager.getConnection(URL);
-            System.out.println("✅ Nueva conexion establecida con SQLite.");
+            System.out.println("Nueva conexion establecida con SQLite.");
             return conn;
         } catch (SQLException e) {
-            System.out.println("❌ Error al conectar con la base de datos: " + e.getMessage());
+            System.out.println("Error al conectar con la base de datos: " + e.getMessage());
             return null;
         }
     }

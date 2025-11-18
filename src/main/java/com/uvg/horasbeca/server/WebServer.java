@@ -10,6 +10,7 @@ import java.util.Map;
 import com.google.gson.Gson;
 import com.uvg.horasbeca.controller.ActividadController;
 import com.uvg.horasbeca.controller.AlumnoController;
+import com.uvg.horasbeca.controller.EncargadoController;
 import com.uvg.horasbeca.database.DbConnection;
 
 import static spark.Spark.before;
@@ -25,15 +26,21 @@ public class WebServer {
 
         staticFiles.location("/web");
 
+        //actividades
         post("/actividades", ActividadController.crearActividad);
-        
-        get("/alumnos/:id/horas", AlumnoController.getHorasAlumno);
-        get("/alumnos/:id/historial", AlumnoController.getHistorialAlumno);
-        
         get("/actividades/disponibles", ActividadController.getActividadesDisponibles);
+        get("/actividades/encargado/:id", ActividadController.getActividadesByEncargado);
+
+
+        //alumnos
+        get("/alumnos/:id/horas", AlumnoController.getHorasAlumno);
+        //get("/alumnos/:id/historial", AlumnoController.getHistorialAlumno);
+        
+        //inscripciones
         post("/inscripciones", AlumnoController.inscribirEnActividad);
 
-        get("/departamentos", AlumnoController.getDepartamentos);      
+        //encargados
+        get("/departamentos", EncargadoController.getDepartamentos);      
 
         System.out.println("Server running on http://localhost:8080");
 

@@ -20,8 +20,8 @@
 <!-- Tabs -->
   <div class="tabs">
     <button class="tab-button active" onclick="openTab('publicar')">Publicar Actividad</button>
-    <button class="tab-button" onclick="openTab('actividades')">Mis Actividades</button>
-    <button class="tab-button" onclick="openTab('detalles')">Detalles de Actividad</button>
+    <button class="tab-button" onclick="openTab('misActividades')">Mis Actividades</button>
+    
   </div>
 
     <!-- Publicar Actividad -->
@@ -40,74 +40,28 @@
     </section>
   </div>
 
-  <!-- Lista de Actividades -->
-  <div id="actividades" class="tab-content">
-    <section>
-      <h2>Mis Actividades Publicadas</h2>
-      <div id="listaActividadesContainer">
-        <table id="tablaActividades">
-          <thead>
-            <tr>
-              <th>Título</th>
-              <th>Fecha</th>
-              <th>Hora</th>
-              <th>Cupo</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="actividadesBody">
-            <!-- Actividades ... -->
-          </tbody>
-        </table>
-      </div>
-    </section>
-  </div>
 
-  <!-- Detalles de Actividad -->
-  <div id="detalles" class="tab-content">
-    <section>
-      <h2>Detalles de Actividad</h2>
-      <div id="detallesActividadContainer" style="display: none;">
-        <div id="detallesActividad">
-          <!-- detalles -->
-        </div>
-        <div id="alumnosInscritos">
-          <!-- estudiiates -->
-        </div>
-        <button onclick="volverALista()">← Volver a la lista</button>
-        <button onclick="editarActividad()" id="btnEditar">✏️ Editar Actividad</button>
-        <button onclick="eliminarActividad()" id="btnEliminar" style="background-color: #dc3545;">🗑️ Eliminar Actividad</button>
-      </div>
-      <div id="sinSeleccion" style="text-align: center; padding: 2rem;">
-        <p>Selecciona una actividad para ver sus detalles</p>
-      </div>
-    </section>
-  </div>
+<!--  tab mis actividades     -->
 
-  <!-- Editar Actividad -->
-  <div id="modalEditar" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
-    <div style="background: white; margin: 5% auto; padding: 2rem; width: 80%; max-width: 600px; border-radius: 8px;">
-      <h2>Editar Actividad</h2>
-      <form id="formEditarActividad">
-        <input type="hidden" id="editarId">
-        <input type="text" id="editarTitulo" placeholder="Título" required><br>
-        <textarea id="editarDescripcion" placeholder="Descripción" required></textarea><br>
-        <input type="number" id="editarHoras" placeholder="Horas otorgadas" required><br>
-        <input type="number" id="editarCupoMaximo" placeholder="Cupo máximo" required><br>
-        <input type="date" id="editarFecha" required><br>
-        <input type="time" id="editarHora" required><br>
-        <button type="button" onclick="guardarEdicion()"> Guardar Cambios</button>
-        <button type="button" onclick="cerrarModal()" style="background-color: #6c7d70;">❌ Cancelar</button>
-      </form>
+
+<div id="misActividades" class="tab-content" style="display:none;">
+  <section>
+    <h2>Actividades Publicadas</h2>
+
+      <div id="cards" class="cards-container"></div>
+      
     </div>
-  </div>
+  </section>
+</div>
+
+
+
 
 
 
     <!-- /////////////////////////////////////// -->
   
-  <script src="alumno.js"></script>
+  <script src="encargado.js"></script>
   
 </body>
 </html>

@@ -71,33 +71,7 @@ public class ActividadController {
             ResultSet rs = stmt.executeQuery();
             
             List<Map<String, Object>> actividades = new ArrayList<>();
-                    System.out.println("=== RAW DATABASE RESULTS ===");
-        while (rs.next()) {
-            Map<String, Object> act = new HashMap<>();
-            act.put("id", rs.getInt("id"));
-            act.put("titulo", rs.getString("titulo"));
             
-            String departamento = rs.getString("departamento");
-            
-            int encargado_id = rs.getInt("encargado_id");
-            
-            // Debug print for each row
-            System.out.println("Activity: " + rs.getString("titulo") + 
-                            " | Encargado ID: " + encargado_id +
-                            
-                            " | Departamento: " + departamento);
-            
-            act.put("descripcion", rs.getString("descripcion"));
-            act.put("horasOtorgadas", rs.getInt("horasOtorgadas"));
-            act.put("cupoMaximo", rs.getInt("cupoMaximo"));
-            act.put("cupoUsado", rs.getInt("cupoUsado"));
-            act.put("fechaActividad", rs.getString("fechaActividad"));
-            act.put("horaActividad", rs.getString("horaActividad"));
-            act.put("departamento", departamento);
-            act.put("encargado_id", encargado_id);
-            actividades.add(act);
-        }
-        System.out.println("=== END DATABASE RESULTS ===");
             while (rs.next()) {
                 Map<String, Object> act = new HashMap<>();
                 act.put("id", rs.getInt("id"));
@@ -124,6 +98,72 @@ public class ActividadController {
             return gson.toJson(Map.of("success", false, "error", e.getMessage()));
         }
     };
+
+
+    public static Route getActividadesByEncargado = (req, res) -> {
+        res.type("application/json");
+        String encargadoId = req.params("id");
+
+    System.out.println("Requested encargado ID: " + req.params(":id"));
+                
+            try (Connection conn = DbConnection.getConnection()) {
+        String sql = """
+            SELECT a.id,
+                    a.titulo,
+                    a.descripcion,
+                    a.horasOtorgadas,
+                    a.cupoUsado,
+                    a.cupoMaximo,
+                    a.fechaActividad,
+                    a.horaActividad,
+                    a.encargado_id,
+                    u.carnetUser
+                    
+            FROM actividades a
+            LEFT JOIN usuarios u ON a.encargado_id = u.carnetUser
+            WHERE a.encargado_id = ?""";
+
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, encargadoId); 
+            ResultSet rs = stmt.executeQuery();
+            
+            List<Map<String, Object>> actividades = new ArrayList<>();
+            int count = 0;
+            while (rs.next()) {
+                Map<String, Object> act = new HashMap<>();
+                act.put("id", rs.getInt("id"));
+                act.put("titulo", rs.getString("titulo"));
+                act.put("descripcion", rs.getString("descripcion"));
+                act.put("horasOtorgadas", rs.getInt("horasOtorgadas"));
+                act.put("cupoMaximo", rs.getInt("cupoMaximo"));
+                act.put("cupoUsado", rs.getInt("cupoUsado"));
+                act.put("fechaActividad", rs.getString("fechaActividad"));
+                act.put("horaActividad", rs.getString("horaActividad"));
+                act.put("encargado_id", rs.getInt("encargado_id"));
+                actividades.add(act);
+                count++;
+            }
+            System.out.println("Fetched " + count + " actividades");
+
+        System.out.println("Actividades fetched for encargado " + encargadoId + ": " + actividades.size());
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("actividades", actividades);
+        return gson.toJson(response);
+
+
+        } catch (SQLException e) {
+        e.printStackTrace();
+        res.status(500);
+        return gson.toJson(Map.of("success", false, "error", "SQL Error: " + e.getMessage()));
+    } catch (Exception e) {
+        e.printStackTrace();
+        res.status(500);
+        return gson.toJson(Map.of("success", false, "error", "Server Error: " + e.getMessage()));
+    }
+};
+
 
 
 }

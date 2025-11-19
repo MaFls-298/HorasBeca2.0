@@ -130,19 +130,17 @@ function showCardsActividades(actividades) {
             <p><strong>Descripción:</strong> ${act.descripcion}</p>
             <p><strong>Fecha:</strong> ${act.fechaActividad}</p>
             <p><strong>Hora:</strong> ${act.horaActividad}</p>
+            <p><strong>Horas Otorgadas:</strong> ${act.horasOtorgadas}</p>
             <p><strong>Cupo:</strong> ${act.cupoUsado}/${act.cupoMaximo}</p>
             <div class="buttons">
                 <button onclick="verDetallesActividad(${act.id})">Ver detalles</button>
                 <button class="btn-editar">Editar</button>
                 <button class="btn-toggle" onclick="cambiarDisponibilidad(${act.id})"> ${act.actividadState ? 'Marcar como no disponible' : 'Marcar como disponible'} </button>
-                <button class="btn-eliminar">Eliminar</button>
+                <button class="btn-eliminar" onclick="eliminarActividadFront(${act.id})">Eliminar</button>
             </div>
         `;
 
         container.appendChild(card);
-        console.log("Button HTML:", `
-    <button onclick="verDetallesActividad(${act.id})">Ver detalles</button>
-`);
     });
 }
 
@@ -154,17 +152,21 @@ async function verDetallesActividad(id) {
 
         console.log("Inscritos:", data);
 
-        const lista = data.inscritos.map(a =>
-          `<li>
-              <strong>${a.nombre}</strong> (${a.carnet}) - ${a.email}
-              <button onclick="validarHoras(${a.carnet}, ${id}, ${a.inscripcionId})">
-                  Validar Horas
-              </button>
-          </li>`
-        ).join("");
+        const lista = data.inscritos.map(a => {
+            const disabled = a.validado ? 'disabled' : '';
+            const label = a.validado ? 'Validado' : 'Validar Horas';
+            return `
+                <li>
+                    <strong>${a.nombre}</strong> (${a.carnet}) - ${a.email}
+                    <button onclick="validarHoras(${a.carnet}, ${id}, ${a.inscripcionId})" ${disabled}>
+                        ${label}
+                    </button>
+                </li>
+            `;
+        }).join("");
 
-        const modalContent = document.getElementById("modalContenido");
-        modalContent.innerHTML = `
+        const detallesContent = document.getElementById("detallesContenido");
+        detallesContent.innerHTML = `
             <h2>Detalles de Actividad</h2>
             <p><strong>ID:</strong> ${id}</p>
 
@@ -174,18 +176,22 @@ async function verDetallesActividad(id) {
             </ul>
         `;
 
-        document.getElementById("modalDetalles").style.display = "block";
+        document.getElementById("detallesDetalles").style.display = "block";
 
     } catch (error) {
         console.error("Error cargando inscritos:", error);
     }
 }
 
-function cerrarModal() {
-    document.getElementById("modalDetalles").style.display = "none";
+function cerrarDetalles() {
+    document.getElementById("detallesDetalles").style.display = "none";
 }
 
 async function validarHoras(alumnoId, actividadId, inscripcionId) {
+    if (!confirm("¿Seguro que deseas validar las horas de este alumno? Esta acción no se puede deshacer.")) {
+        return;
+    }
+
     try {
         const res = await fetch("http://localhost:8080/inscripcion/validarHoras", {
             method: "POST",
@@ -209,6 +215,7 @@ async function validarHoras(alumnoId, actividadId, inscripcionId) {
 
 
 //cambiar disponible ////////////////////////////////////////////////////////////////
+
 async function cambiarDisponibilidad(actividadId) {
     try {
         const res = await fetch("http://localhost:8080/actividades/toggleDisponibilidad", {
@@ -230,6 +237,31 @@ async function cambiarDisponibilidad(actividadId) {
     } catch (error) {
         console.error("Error cambiando disponibilidad:", error);
         alert("Error al cambiar disponibilidad.");
+    }
+}
+
+async function eliminarActividadFront(actividadId) {
+    const confirmar = window.confirm("¿Estás seguro que quieres eliminar esta actividad?");
+    if (!confirmar) return;
+
+    try {
+        const res = await fetch("http://localhost:8080/actividades/eliminar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ actividadId })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            alert(data.msg);
+            loadActividadesPublicadas();
+        } else {
+            alert("No se pudo eliminar la actividad: " + data.msg);
+        }
+    } catch (error) {
+        console.error("Error eliminando actividad:", error);
+        alert("Error al eliminar la actividad.");
     }
 }
 

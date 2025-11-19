@@ -31,6 +31,7 @@ public class WebServer {
         get("/actividades/disponibles", ActividadController.getActividadesDisponibles);
         get("/actividades/encargado/:id", ActividadController.getActividadesByEncargado);
         post("/actividades/toggleDisponibilidad", ActividadController.toggleDisponibilidadActividad);
+        post("/actividades/eliminar", ActividadController.eliminarActividad);
 
 
 
@@ -38,8 +39,7 @@ public class WebServer {
         get("/alumnos/:id/horas", AlumnoController.getHorasAlumno);
         get("/actividades/inscritos/:id", AlumnoController.getInscritosByActividad);
         post("/actividades/inscribirse", AlumnoController.inscribirseActividad);
-
-        //get("/alumnos/:id/historial", AlumnoController.getHistorialAlumno);
+        get("/alumnos/historial/:id", AlumnoController.getHistorialAlumno);
         
 
         //encargados

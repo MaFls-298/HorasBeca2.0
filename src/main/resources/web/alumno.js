@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // datos iniciales
     cargarHorasAlumno();
     loadActividadesDisponibles();
-    cargarHistorialAlumno();
+    loadHistorialAlumno();
     cargarDepartamentos();
 });
 
@@ -104,24 +104,34 @@ async function loadActividadesDisponibles() {
 }
 
 //tabla mostrar
-function showActividades(actividades){
-    console.log("Ejemplo de actividad:", actividades[0]);
-        const tabla = document.getElementById('tablaActividades');
-        tabla.innerHTML = ''; // clear 
+function showActividades(actividades) {
+    const container = document.getElementById('listaActividades');
+    container.innerHTML = ''; 
 
-        actividades.forEach(act => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${act.titulo}</td>
-            <td>${act.descripcion}</td>
-            <td>${act.horasOtorgadas}</td>
-            <td>${act.cupoUsado}/${act.cupoMaximo}</td>
-            <td>${act.fechaActividad}</td>
-            <td>${act.horaActividad || ''}</td>
-            <td><button onclick="inscribirse(${act.id})">Inscribirse</button></td>`;
-            tabla.appendChild(row);
-        });
+    if (!actividades || actividades.length === 0) {
+        container.innerHTML = '<p>No hay actividades disponibles.</p>';
+        return;
+    }
+
+    actividades.forEach(act => {
+        const card = document.createElement('div');
+        card.classList.add('actividad-card');
+
+        card.innerHTML = `
+            <h3>${act.titulo}</h3>
+            <p><strong>Descripción:</strong> ${act.descripcion}</p>
+            <p><strong>Horas Beca:</strong> ${act.horasOtorgadas}</p>
+            <p><strong>Cupo:</strong> ${act.cupoUsado}/${act.cupoMaximo}</p>
+            <p><strong>Fecha:</strong> ${act.fechaActividad}</p>
+            <p><strong>Hora:</strong> ${act.horaActividad || ''}</p>
+            <p><strong>Departamento:</strong> ${act.departamento || 'N/A'}</p>
+            <button onclick="inscribirse(${act.id})">Inscribirse</button>
+        `;
+
+        container.appendChild(card);
+    });
 }
+
 
 // filtrar 
 function filtrarActividades() {
@@ -151,6 +161,7 @@ function filtrarActividades() {
 }
 
 // departamento /////////////////////////////////////////////////
+
 async function cargarDepartamentos() {
     try {
         const res = await fetch('/departamentos');
@@ -169,13 +180,14 @@ async function cargarDepartamentos() {
 
 
 // inscribirse //////////////////////////////////////////////////////
+
 async function inscribirse(actividadId) {
     const usuario = JSON.parse(localStorage.getItem('usuario'));
     const alumnoId = usuario.id;
 
-    // ✅ Confirmation message
+
     const confirmar = window.confirm("¿Estás seguro que quieres inscribirte en esta actividad?");
-    if (!confirmar) return; // User canceled
+    if (!confirmar) return; // canceled
 
     try {
         const res = await fetch("http://localhost:8080/actividades/inscribirse", {
@@ -188,7 +200,7 @@ async function inscribirse(actividadId) {
 
         if (data.success) {
             alert(data.msg);
-            // Refresh the table to show updated cupoUsado
+            
             loadActividadesDisponibles();
         } else {
             alert("No se pudo inscribir: " + data.msg);
@@ -200,44 +212,43 @@ async function inscribirse(actividadId) {
     }
 }
 
+async function loadHistorialAlumno() {
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    const alumnoId = usuario.id;
 
-
-async function cargarHistorialAlumno() {
     try {
-        const res = await fetch(`/alumnos/${alumnoId}/historial`);
+        const res = await fetch(`http://localhost:8080/alumnos/historial/${alumnoId}`);
         const data = await res.json();
-        
-        if (data.success) {
-            mostrarHistorialAlumno(data.inscripciones);
+
+        if (!data.success) {
+            loadHistorialAlumno();
+            alert("Error cargando historial: " + data.msg);
+            return;
         }
+
+        const tbody = document.querySelector("#historialTabla tbody");
+        tbody.innerHTML = ""; // clear
+
+        data.historial.forEach(act => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${act.titulo}</td>
+                <td>${act.descripcion}</td>
+                <td>${act.horasOtorgadas}</td>
+                <td>${act.cupoUsado}/${act.cupoMaximo}</td>
+                <td>${act.fechaActividad}</td>
+                <td>${act.horaActividad || ''}</td>
+                <td>${act.encargadoNombre}</td>
+                <td>${act.estado}</td>
+            `;
+            tbody.appendChild(row);
+        });
+
     } catch (error) {
-        console.error('Error loading history:', error);
+        console.error("Error cargando historial:", error);
     }
 }
 
-
-function mostrarHistorialAlumno(inscripciones) {
-    const tbody = document.querySelector('#tablaHistorial tbody');
-    
-    if (inscripciones.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="no-data">No tienes actividades en tu historial.</td></tr>';
-        return;
-    }
-
-    tbody.innerHTML = inscripciones.map(insc => `
-        <tr data-status="${insc.asistenciaValidada ? 'validated' : insc.actividadCompletada ? 'completed' : 'pending'}">
-            <td>${insc.tituloActividad}</td>
-            <td>${new Date(insc.fechaActividad).toLocaleDateString()}</td>
-            <td>${insc.horasOtorgadas}</td>
-            <td>
-                <span class="status-badge ${insc.asistenciaValidada ? 'validated' : insc.actividadCompletada ? 'completed' : 'pending'}">
-                    ${insc.asistenciaValidada ? 'Validado' : insc.actividadCompletada ? 'Completado' : 'Pendiente'}
-                </span>
-            </td>
-            <td>${new Date(insc.fechaInscripcion).toLocaleDateString()}</td>
-        </tr>
-    `).join('');
-}
 
 function filtrarHistorial() {
     const statusFilter = document.getElementById('filterStatus').value;

@@ -58,7 +58,7 @@ public class AlumnoController {
 
         Connection conn = DbConnection.getConnection();
         PreparedStatement stmt = conn.prepareStatement(
-            "SELECT u.carnetUser, u.nombreUser, u.emailInstitucional, i.id AS inscripcionId " +
+            "SELECT u.carnetUser, u.nombreUser, u.emailInstitucional, i.id AS inscripcionId, i.asistenciaValidada " +
             "FROM inscripciones i " +
             "JOIN usuarios u ON i.alumnoId = u.carnetUser " +
             "WHERE i.actividadId = ?"
@@ -75,6 +75,7 @@ public class AlumnoController {
             alumno.put("nombre", rs.getString("nombreUser"));
             alumno.put("email", rs.getString("emailInstitucional"));
             alumno.put("inscripcionId", rs.getInt("inscripcionId"));
+            alumno.put("validado", rs.getBoolean("asistenciaValidada"));
             inscritos.add(alumno);
         }
 
@@ -87,45 +88,55 @@ public class AlumnoController {
     // Get historial del alumno ///////////////////////////////
     public static Route getHistorialAlumno = (req, res) -> {
         res.type("application/json");
-        String alumnoId = req.params("id");
-        
-        System.out.println("Getting history for student: " + alumnoId);
-        
+        int alumnoId = Integer.parseInt(req.params(":id")); // alumnoId
+
         try (Connection conn = DbConnection.getConnection()) {
-            
-            String sql = "SELECT i.*, a.titulo as tituloActividad, a.fechaActividad, a.horaActividad, a.horasOtorgadas, " +
-                        "CASE WHEN a.fechaActividad < date('now') THEN 1 ELSE 0 END as actividadCompletada " +
-                        "FROM inscripciones i " +
-                        "JOIN Actividades a ON i.actividadId = a.id " +
-                        "WHERE i.alumnoId = ? " + 
-                        "ORDER BY a.fechaActividad DESC, i.fechaInscripcion DESC";
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, alumnoId);
+
+            PreparedStatement stmt = conn.prepareStatement(
+            "SELECT a.id, a.titulo, a.descripcion, a.horasOtorgadas, a.cupoUsado, a.cupoMaximo, " +
+            "a.fechaActividad, a.horaActividad, u.nombreUser AS encargadoNombre, i.asistenciaValidada " +
+            "FROM inscripciones i " +
+            "JOIN actividades a ON i.actividadId = a.id " +
+            "JOIN usuarios u ON a.encargado_id = u.carnetUser " + 
+            "WHERE i.alumnoId = ? " +
+            "ORDER BY a.fechaActividad DESC, a.horaActividad DESC"
+            );
+            stmt.setInt(1, alumnoId);
             ResultSet rs = stmt.executeQuery();
-            
-            List<Map<String, Object>> inscripciones = new ArrayList<>();
+
+            List<Map<String,Object>> historial = new ArrayList<>();
+
             while (rs.next()) {
-                Map<String, Object> inscripcion = new HashMap<>();
-                inscripcion.put("id", rs.getInt("id"));
-                inscripcion.put("tituloActividad", rs.getString("tituloActividad"));
-                inscripcion.put("fechaActividad", rs.getString("fechaActividad"));
-                inscripcion.put("horaActividad", rs.getString("horaActividad"));
-                inscripcion.put("horasOtorgadas", rs.getInt("horasOtorgadas"));
-                inscripcion.put("asistenciaValidada", rs.getBoolean("asistenciaValidada"));
-                inscripcion.put("actividadCompletada", rs.getBoolean("actividadCompletada"));
-                inscripcion.put("fechaInscripcion", rs.getString("fechaInscripcion"));
-                inscripciones.add(inscripcion);
+            Map<String,Object> act = new HashMap<>();
+            act.put("id", rs.getInt("id"));
+            act.put("titulo", rs.getString("titulo"));
+            act.put("descripcion", rs.getString("descripcion"));
+            act.put("horasOtorgadas", rs.getInt("horasOtorgadas"));
+            act.put("cupoUsado", rs.getInt("cupoUsado"));
+            act.put("cupoMaximo", rs.getInt("cupoMaximo"));
+            act.put("fechaActividad", rs.getString("fechaActividad"));
+            act.put("horaActividad", rs.getString("horaActividad"));
+            act.put("encargadoNombre", rs.getString("encargadoNombre"));
+
+                // estado
+                boolean validado = rs.getBoolean("asistenciaValidada");
+                String estado = validado ? "Validado" : "Pendiente";
+                act.put("estado", estado);
+
+                historial.add(act);
             }
-            
-            return gson.toJson(Map.of("success", true, "inscripciones", inscripciones));
-        } catch (SQLException e) {
-            System.err.println("Error getting student history: " + e.getMessage());
-            res.status(500);
-            return gson.toJson(Map.of("success", false, "error", e.getMessage()));
+
+            return new Gson().toJson(Map.of("success", true, "historial", historial));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Gson().toJson(Map.of("success", false, "msg", "Error cargando historial"));
         }
     };
 
+
     // inscribirse en actiividad ///////////////////////////////////////////
+
     public static Route inscribirseActividad = (req, res) -> {
         res.type("application/json");
         Map<String, Object> body = new Gson().fromJson(req.body(), Map.class);
@@ -170,6 +181,13 @@ public class AlumnoController {
             updateCupo.setInt(1, actividadId);
             updateCupo.executeUpdate();
 
+            PreparedStatement stmtAutoToggle = conn.prepareStatement(
+            "UPDATE actividades SET actividadState = 0 " +
+            "WHERE id = ? AND cupoUsado >= cupoMaximo"
+            );
+            stmtAutoToggle.setInt(1, actividadId);
+            stmtAutoToggle.executeUpdate();
+
             return new Gson().toJson(Map.of("success", true, "msg", "Inscripción exitosa"));
 
         } catch (SQLException e) {
@@ -177,7 +195,5 @@ public class AlumnoController {
             return new Gson().toJson(Map.of("success", false, "msg", "Error en la inscripción"));
         }
     };
-
-
     
 }

@@ -10,7 +10,7 @@
     <div class="container">
         <header>
             <h1>Panel del Alumno</h1>
-            <div class="user-info">
+            <div class="logout">
                 <span id="alumnoNombre"></span>
                 <button onclick="logout()">Cerrar Sesión</button>
             </div>
@@ -55,21 +55,6 @@
         <!-- actividades -->
         <div id="actividadesTab" class="tab-content">
             <h2>Actividades Disponibles</h2>
-            
-            <table>
-                <thead>
-                    <tr>
-                    <th>Título</th>
-                    <th>Descripción</th>
-                    <th>Horas</th>
-                    <th>Cupo</th>
-                    <th>Fecha</th>
-                    <th>Hora</th>
-                    <th>Acción</th>
-                    </tr>
-                </thead>
-                <tbody id="tablaActividades"></tbody>
-                </table>
 
             <div class="filters">
                 <input type="text" id="searchActivity" placeholder="Buscar actividades..." onkeyup="filtrarActividades()">
@@ -83,33 +68,29 @@
             </div>
         </div>
 
-        <!-- Historial -->
+                <!-- Historial -->
+
         <div id="historialTab" class="tab-content">
-            <h2>Mi Historial de Actividades</h2>
-            <div class="history-filters">
-                <select id="filterStatus" onchange="filtrarHistorial()">
-                    <option value="">Todos los estados</option>
-                    <option value="pending">Pendiente</option>
-                    <option value="completed">Completado</option>
-                    <option value="validated">Validado</option>
-                </select>
-            </div>
-            <table id="tablaHistorial" class="history-table">
+            <h2>Historial de Actividades</h2>
+            <table id="historialTabla">
                 <thead>
                     <tr>
-                        <th>Actividad</th>
+                        <th>Título</th>
+                        <th>Descripción</th>
+                        <th>Horas Beca</th>
+                        <th>Cupo</th>
                         <th>Fecha</th>
-                        <th>Horas</th>
+                        <th>Hora</th>
+                        <th>Encargado</th>
                         <th>Estado</th>
-                        <th>Fecha de Inscripción</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <!-- Historial -->
-                </tbody>
+                <tbody></tbody>
             </table>
         </div>
-    </div>
+
+
+
 
     <script src="alumno.js"></script>
 </body>

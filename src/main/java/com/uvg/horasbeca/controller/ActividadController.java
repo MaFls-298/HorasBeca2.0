@@ -209,15 +209,48 @@ public class ActividadController {
                 "success", true,
                 "newState", newState,
                 "msg", newState ? "Actividad disponible" : "Actividad no disponible"
-            ));
+            ));    
         }
-
     } catch (Exception e) {
         e.printStackTrace();
         return new Gson().toJson(Map.of("success", false, "msg", "Error interno del servidor"));
     }
 };
 
+    public static Route eliminarActividad = (req, res) -> {
+        res.type("application/json");
+
+        try {
+            Map<String, Object> body = new Gson().fromJson(req.body(), Map.class);
+            if (body == null || !body.containsKey("actividadId")) {
+                return new Gson().toJson(Map.of("success", false, "msg", "Faltan datos requeridos"));
+            }
+
+            int actividadId = ((Number) body.get("actividadId")).intValue();
+
+            try (Connection conn = DbConnection.getConnection()) {
+                    //borrar insc
+                PreparedStatement delIns = conn.prepareStatement(
+                    "DELETE FROM inscripciones WHERE actividadId = ?"
+                );
+                delIns.setInt(1, actividadId);
+                delIns.executeUpdate();
+
+                // Delete actividad
+                PreparedStatement delAct = conn.prepareStatement(
+                    "DELETE FROM actividades WHERE id = ?"
+                );
+                delAct.setInt(1, actividadId);
+                delAct.executeUpdate();
+
+                return new Gson().toJson(Map.of("success", true, "msg", "Actividad eliminada correctamente"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Gson().toJson(Map.of("success", false, "msg", "Error interno del servidor"));
+        }
+    };
 
 
 }

@@ -56,7 +56,25 @@ public class EncargadoController {
 
             try (Connection conn = DbConnection.getConnection()) {
 
-                // Get horasOtorgadas and alumnoId
+                PreparedStatement stmtCheck = conn.prepareStatement(
+                    "SELECT asistenciaValidada FROM inscripciones WHERE id = ?"
+                );
+                stmtCheck.setInt(1, inscripcionId);
+                ResultSet rsCheck = stmtCheck.executeQuery();
+
+                if (!rsCheck.next()) {
+                    return new Gson().toJson(Map.of("success", false, "msg", "Inscripción no encontrada"));
+                }
+
+                boolean yaValidada = rsCheck.getBoolean("asistenciaValidada");
+
+                if (yaValidada) {
+                    return new Gson().toJson(Map.of(
+                        "success", false,
+                        "msg", "Las horas ya fueron validadas previamente"
+                    ));
+                }
+
                 PreparedStatement stmtAct = conn.prepareStatement(
                     "SELECT a.horasOtorgadas, i.alumnoId " +
                     "FROM actividades a " +
@@ -73,10 +91,12 @@ public class EncargadoController {
                 int horasOtorgadas = rs.getInt("horasOtorgadas");
                 int alumnoId = rs.getInt("alumnoId");
 
-                // Update usuario
                 PreparedStatement stmtUsr = conn.prepareStatement(
                     "UPDATE usuarios SET horasAcumuladas = horasAcumuladas + ?, " +
-                    "horasBecaPendiente = CASE WHEN horasBecaPendiente - ? < 0 THEN 0 ELSE horasBecaPendiente - ? END " +
+                    "horasBecaPendiente = CASE " +
+                    "    WHEN horasBecaPendiente - ? < 0 THEN 0 " +
+                    "    ELSE horasBecaPendiente - ? " +
+                    "END " +
                     "WHERE carnetUser = ?"
                 );
                 stmtUsr.setInt(1, horasOtorgadas);
@@ -85,28 +105,24 @@ public class EncargadoController {
                 stmtUsr.setInt(4, alumnoId);
                 stmtUsr.executeUpdate();
 
-
-                // Update inscripcion
+                
                 PreparedStatement stmtIns = conn.prepareStatement(
                     "UPDATE inscripciones SET asistenciaValidada = TRUE WHERE id = ?"
                 );
                 stmtIns.setInt(1, inscripcionId);
                 stmtIns.executeUpdate();
 
-                return new Gson().toJson(Map.of("success", true));
-
+                return new Gson().toJson(Map.of(
+                    "success", true,
+                    "msg", "Horas validadas correctamente"
+                ));
             }
 
         } catch (Exception e) {
-            e.printStackTrace(); // VERY IMPORTANT: check server logs
+            e.printStackTrace(); 
             return new Gson().toJson(Map.of("success", false, "msg", "Error interno del servidor"));
         }
     };
-
-
-
-
-
 
 
 }

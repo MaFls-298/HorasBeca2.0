@@ -20,8 +20,6 @@ public class EncargadoController {
     public static Route getDepartamentos = (req, res) -> {
         res.type("application/json");
         
-        System.out.println("Getting departmentos");
-        
         try (Connection conn = DbConnection.getConnection()) {
             String sql = "SELECT DISTINCT departamento FROM usuarios WHERE departamento IS NOT NULL";
             PreparedStatement stmt = conn.prepareStatement(sql);

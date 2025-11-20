@@ -187,7 +187,7 @@ async function inscribirse(actividadId) {
 
 
     const confirmar = window.confirm("¿Estás seguro que quieres inscribirte en esta actividad?");
-    if (!confirmar) return; // canceled
+    if (!confirmar) return; // cancel
 
     try {
         const res = await fetch("http://localhost:8080/actividades/inscribirse", {
@@ -247,20 +247,6 @@ async function loadHistorialAlumno() {
     } catch (error) {
         console.error("Error cargando historial:", error);
     }
-}
-
-
-function filtrarHistorial() {
-    const statusFilter = document.getElementById('filterStatus').value;
-    const rows = document.querySelectorAll('#tablaHistorial tbody tr');
-    
-    rows.forEach(row => {
-        if (!statusFilter || row.getAttribute('data-status') === statusFilter) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
-        }
-    });
 }
 
 // Logout

@@ -252,6 +252,71 @@ public class ActividadController {
         }
     };
 
+    public static Route updateActividad = (req, res) -> {
+        res.type("application/json");
+        try (Connection conn = DbConnection.getConnection()) {
+            Map<String,Object> body = new Gson().fromJson(req.body(), Map.class);
+            int id = Integer.parseInt(req.params(":id"));
+
+            PreparedStatement stmt = conn.prepareStatement(
+                "UPDATE actividades SET titulo = ?, descripcion = ?, horasOtorgadas = ?, cupoMaximo = ?, " +
+                "fechaActividad = ?, horaActividad = ? WHERE id = ?"
+            );
+            stmt.setString(1, (String) body.get("titulo"));
+            stmt.setString(2, (String) body.get("descripcion"));
+            stmt.setInt(3, ((Number) body.get("horasOtorgadas")).intValue());
+            stmt.setInt(4, ((Number) body.get("cupoMaximo")).intValue());
+            stmt.setString(5, (String) body.get("fechaActividad"));
+            stmt.setString(6, (String) body.get("horaActividad"));
+            stmt.setInt(7, id);
+
+            int updated = stmt.executeUpdate();
+            if (updated > 0) {
+                return new Gson().toJson(Map.of("success", true));
+            } else {
+                return new Gson().toJson(Map.of("success", false, "msg", "No se encontró la actividad"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Gson().toJson(Map.of("success", false, "msg", "Error actualizando actividad"));
+        }
+    };
+
+    public static Route getActividadbyId = (req, res) -> {
+        res.type("application/json");
+        int id = Integer.parseInt(req.params(":id"));
+        
+        try (Connection conn = DbConnection.getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement(
+                "SELECT * FROM actividades WHERE id = ?"
+            );
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Map<String, Object> act = new HashMap<>();
+                act.put("id", rs.getInt("id"));
+                act.put("titulo", rs.getString("titulo"));
+                act.put("descripcion", rs.getString("descripcion"));
+                act.put("horasOtorgadas", rs.getInt("horasOtorgadas"));
+                act.put("cupoMaximo", rs.getInt("cupoMaximo"));
+                act.put("cupoUsado", rs.getInt("cupoUsado"));
+                act.put("fechaActividad", rs.getString("fechaActividad"));
+                act.put("horaActividad", rs.getString("horaActividad"));
+                act.put("encargado_id", rs.getInt("encargado_id"));
+
+                return new Gson().toJson(Map.of("success", true, "actividad", act));
+            } else {
+                return new Gson().toJson(Map.of("success", false, "msg", "Actividad no encontrada"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Gson().toJson(Map.of("success", false, "msg", "Error interno"));
+        }
+    };
+
 
 }
 

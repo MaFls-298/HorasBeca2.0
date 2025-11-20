@@ -82,12 +82,13 @@ async function publicarActividad() {
 }
 
 
+
 // Activiidades publicadas por encargado //////////////////////////////////////////////////
 
 async function loadActividadesPublicadas() {
   console.log("Encargado ID:", encargadoId);
 
-try {
+    try {
         console.log("Fetching activities for encargado:", encargadoId);
         
         const response = await fetch(`http://localhost:8080/actividades/encargado/${encargadoId}`);
@@ -126,6 +127,8 @@ function showCardsActividades(actividades) {
         card.classList.add("card");
 
         card.innerHTML = `
+            <div class="status-circle ${act.actividadState ? 'disponible' : 'no-disponible'}" 
+            onclick="toggleDisponibilidad(${act.id}, this)"></div>
             <h3>${act.titulo}</h3>
             <p><strong>Descripción:</strong> ${act.descripcion}</p>
             <p><strong>Fecha:</strong> ${act.fechaActividad}</p>
@@ -134,8 +137,8 @@ function showCardsActividades(actividades) {
             <p><strong>Cupo:</strong> ${act.cupoUsado}/${act.cupoMaximo}</p>
             <div class="buttons">
                 <button onclick="verDetallesActividad(${act.id})">Ver detalles</button>
-                <button class="btn-editar">Editar</button>
-                <button class="btn-toggle" onclick="cambiarDisponibilidad(${act.id})"> ${act.actividadState ? 'Marcar como no disponible' : 'Marcar como disponible'} </button>
+                <button class="btn-editar" onclick="editarActividad(${act.id})">Editar</button>
+                
                 <button class="btn-eliminar" onclick="eliminarActividadFront(${act.id})">Eliminar</button>
             </div>
         `;
@@ -143,6 +146,11 @@ function showCardsActividades(actividades) {
         container.appendChild(card);
     });
 }
+
+
+
+//ver detalles actividad ////////////////////////////////////////////////////////////////
+
 
 async function verDetallesActividad(id) {
   
@@ -214,9 +222,11 @@ async function validarHoras(alumnoId, actividadId, inscripcionId) {
 }
 
 
+
+
 //cambiar disponible ////////////////////////////////////////////////////////////////
 
-async function cambiarDisponibilidad(actividadId) {
+async function toggleDisponibilidad(actividadId, circleElement) {
     try {
         const res = await fetch("http://localhost:8080/actividades/toggleDisponibilidad", {
             method: "POST",
@@ -227,18 +237,29 @@ async function cambiarDisponibilidad(actividadId) {
         const data = await res.json();
 
         if (data.success) {
-            alert(data.msg);
-            // Refresh
-            loadActividadesPublicadas();
+            // Update circle color
+            if (data.newState) {
+                circleElement.classList.remove("no-disponible");
+                circleElement.classList.add("disponible");
+            } else {
+                circleElement.classList.remove("disponible");
+                circleElement.classList.add("no-disponible");
+            }
+
         } else {
-            alert("No se pudo cambiar disponibilidad: " + data.msg);
+            alert("Error: " + data.msg);
         }
 
-    } catch (error) {
-        console.error("Error cambiando disponibilidad:", error);
-        alert("Error al cambiar disponibilidad.");
+    } catch (err) {
+        console.error("Error toggling disponibilidad:", err);
+        alert("Error en el servidor");
     }
 }
+
+
+
+
+//eliminar actividad ////////////////////////////////////////////////////////////////
 
 async function eliminarActividadFront(actividadId) {
     const confirmar = window.confirm("¿Estás seguro que quieres eliminar esta actividad?");
@@ -267,9 +288,113 @@ async function eliminarActividadFront(actividadId) {
 
 
 
+//editar act //////////////////////////////////////////////////////////////
+
+async function editarActividad(id) {
+    try {
+        const res = await fetch(`http://localhost:8080/actividades/${id}`);
+        const data = await res.json();
+        if (!data.success) {
+            alert("No se pudo cargar la actividad");
+            return;
+        }
+
+        const act = data.actividad;
+
+        document.getElementById("editActividadId").value = act.id;
+        document.getElementById("editTitulo").value = act.titulo;
+        document.getElementById("editDescripcion").value = act.descripcion;
+        document.getElementById("editHoras").value = act.horasOtorgadas;
+        document.getElementById("editCupo").value = act.cupoMaximo;
+        document.getElementById("editFecha").value = act.fechaActividad;
+        document.getElementById("editHora").value = act.horaActividad || '';
+
+        document.getElementById("modalEditarActividad").style.display = "flex";
+    } catch (err) {
+        console.error("Error cargando actividad:", err);
+    }
+}
+
+function cerrarModalEditar() {
+    document.getElementById("modalEditarActividad").style.display = "none";
+}
+
+// Submit 
+document.getElementById("formEditarActividad").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const id = document.getElementById("editActividadId").value;
+    const titulo = document.getElementById("editTitulo").value;
+    const descripcion = document.getElementById("editDescripcion").value;
+    const horasOtorgadas = parseInt(document.getElementById("editHoras").value);
+    const cupoMaximo = parseInt(document.getElementById("editCupo").value);
+    const fechaActividad = document.getElementById("editFecha").value;
+    const horaActividad = document.getElementById("editHora").value;
+
+    try {
+        const res = await fetch(`http://localhost:8080/actividades/editar/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ titulo, descripcion, horasOtorgadas, cupoMaximo, fechaActividad, horaActividad })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            alert("Actividad actualizada correctamente");
+            cerrarModalEditar();
+            loadActividadesPublicadas(); // refresh cards
+        } else {
+            alert("Error: " + data.msg);
+        }
+    } catch (err) {
+        console.error("Error editando actividad:", err);
+    }
+});
 
 
 
+
+function cerrarModalEditar() {
+    document.getElementById("modalEditarActividad").style.display = "none";
+}
+
+document.getElementById("formEditarActividad").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const id = document.getElementById("editActividadId").value;
+    const titulo = document.getElementById("editTitulo").value;
+    const descripcion = document.getElementById("editDescripcion").value;
+    const horasOtorgadas = parseInt(document.getElementById("editHoras").value);
+    const cupoMaximo = parseInt(document.getElementById("editCupo").value);
+    const fechaActividad = document.getElementById("editFecha").value;
+    const horaActividad = document.getElementById("editHora").value;
+
+    try {
+        const res = await fetch(`http://localhost:8080/actividades/editar/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ titulo, descripcion, horasOtorgadas, cupoMaximo, fechaActividad, horaActividad })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            alert("Actividad actualizada correctamente");
+            cerrarModalEditar();
+            loadActividadesPublicadas(); // refresh cards
+        } else {
+            alert("Error: " + data.msg);
+        }
+
+    } catch (err) {
+        console.error("Error al actualizar actividad:", err);
+    }
+});
+
+
+
+
+
+//logout ////////////////////////////////////////////////////////////////
 function logout() {
   localStorage.clear();
   window.location.href = '/index.html';

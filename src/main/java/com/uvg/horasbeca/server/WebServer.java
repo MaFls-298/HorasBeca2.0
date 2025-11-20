@@ -17,6 +17,7 @@ import static spark.Spark.before;
 import static spark.Spark.get;
 import static spark.Spark.port;
 import static spark.Spark.post;
+import static spark.Spark.put;
 import static spark.Spark.staticFiles;
 
 public class WebServer {
@@ -32,7 +33,8 @@ public class WebServer {
         get("/actividades/encargado/:id", ActividadController.getActividadesByEncargado);
         post("/actividades/toggleDisponibilidad", ActividadController.toggleDisponibilidadActividad);
         post("/actividades/eliminar", ActividadController.eliminarActividad);
-
+        get("actividades/:id", ActividadController.getActividadbyId);
+        put("/actividades/editar/:id", ActividadController.updateActividad);
 
 
         //alumnos

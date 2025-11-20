@@ -61,6 +61,40 @@
   </div>
 </div>
 
+<!-- Edit Activ  -->
+<div id="modalEditarActividad" class="popup-card">
+    <div class="popup-card-content">
+        <h2>Editar Actividad</h2>
+        <form id="formEditarActividad">
+            <input type="hidden" id="editActividadId">
+
+            <label>Título:</label>
+            <input type="text" id="editTitulo" required>
+
+            <label>Descripción:</label>
+            <textarea id="editDescripcion" required></textarea>
+
+            <label>Horas Otorgadas:</label>
+            <input type="number" id="editHoras" required>
+
+            <label>Cupo Máximo:</label>
+            <input type="number" id="editCupo" required>
+
+            <label>Fecha:</label>
+            <input type="date" id="editFecha" required>
+
+            <label>Hora:</label>
+            <input type="time" id="editHora">
+
+            <div class="popup-buttons">
+                <button type="submit">Guardar</button>
+                <button type="button" onclick="cerrarModalEditar()">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 
 
 
